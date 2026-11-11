@@ -68,7 +68,7 @@ int live_snapshot_json(char *buf, size_t len)
     xSemaphoreTake(lock, portMAX_DELAY);
     strcpy(r, race);
     xSemaphoreGive(lock);
-    return snprintf(buf, len,
+    int n = snprintf(buf, len,
         "{\"values\":{\"distance\":%d,\"speed\":%.2f,\"stroke_rate\":%d,\"strokes\":%d,"
         "\"duration\":%d,\"watts\":%d,\"total_distance\":%d,\"ratio\":%.2f,"
         "\"firmware_version\":\"%s\",\"s4_connected\":%s,\"usb_mode\":%s},"
@@ -80,4 +80,7 @@ int live_snapshot_json(char *buf, size_t len)
         l.session_id, l.session_active ? "true" : "false",
         (long long) (updated_us / 1000000), time(NULL) > 1700000000 ? "true" : "false",
         r[0] ? r : "null");
+    if (n < 0) n = 0;
+    if ((size_t) n >= len) n = len ? (int) len - 1 : 0;      /* never report more than was written */
+    return n;
 }

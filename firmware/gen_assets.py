@@ -1,5 +1,5 @@
 # PlatformIO pre-build script: turns web/* into src/web_assets.c (gzip-compressed C arrays).
-import gzip, os
+import base64, gzip, hashlib, os, re
 Import("env")  # noqa: F821  (provided by PlatformIO)
 
 root = env.subst("$PROJECT_DIR")  # noqa: F821
@@ -13,6 +13,13 @@ for name in files:
         out.append(",".join(str(b) for b in data[i:i + 24]) + ",")
     out.append("};")
     out.append(f"const unsigned int asset_{sym}_len = {len(data)};")
+# Content-Security-Policy for the main page: its inline scripts are allowed by hash only.
+html = open(os.path.join(root, "web", "index.html"), encoding="utf-8").read()
+hashes = " ".join("'sha256-" + base64.b64encode(hashlib.sha256(s.encode("utf-8")).digest()).decode() + "'"
+                  for s in re.findall(r"<script>(.*?)</script>", html, re.S))
+csp = ("default-src 'self'; script-src 'self' " + hashes + "; style-src 'self' 'unsafe-inline'; "
+       "img-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'")
+out.append('const char asset_index_csp[] = "' + csp + '";')
 new = "\n".join(out) + "\n"
 path = os.path.join(root, "src", "web_assets.c")
 if not os.path.exists(path) or open(path).read() != new:

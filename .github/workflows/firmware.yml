@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
+      - name: Host tests
+        run: sh firmware/test/host/run.sh
       - run: pip install platformio
       - run: pio run
         working-directory: firmware

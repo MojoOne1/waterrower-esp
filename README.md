@@ -48,6 +48,31 @@ Partitionen (16 MB): 2× 3 MB App (OTA) + ~10 MB Speicher für Einheiten.
 
 **Umzug in ein anderes Haus:** ESP einstecken – findet er das alte WLAN nicht, öffnet er nach ~20 s den Hotspot. Neues WLAN eintragen, fertig.
 
+## Sicherheit
+
+Der ESP hängt ohne TLS im Heimnetz. Was die Firmware dagegen tut – und was nicht:
+
+- **Gerätepasswort (optional, empfohlen):** unter *WLAN & Einstellungen* setzen. Danach brauchen alle ändernden Zugriffe (Einstellungen, Löschen, Sitzung beenden, Firmware-Update) das Passwort; der Browser fragt einmal danach (Benutzername beliebig). Gespeichert wird nur ein gesalzener Hash. Vergessen? `pio run -t erase` und neu flashen.
+- **Hotspot-Passwort:** ebenfalls dort änderbar. Der Standard `waterrower` ist öffentlich bekannt – ändern, wenn der Hotspot in Reichweite Fremder liegt.
+- **Schutz vor fremden Webseiten:** Anfragen werden nur angenommen, wenn der ESP per IP-Adresse oder lokalem Namen (`waterrower.local`, `waterrower.lan` …) angesprochen wird (DNS-Rebinding) und ändernde Anfragen von seiner eigenen Seite kommen (CSRF). Hinter einem anderen Namen (z. B. `waterrower.fritz.box`) antwortet die API deshalb mit 403 – dann die IP nehmen.
+- **Arena-Token:** wird nie ausgegeben und nur an die Adresse gesendet, für die er eingetragen wurde; beim Ändern der Adresse muss er neu eingegeben werden.
+- **Firmware-Update:** nur Images dieses Projekts, nicht während einer Aufzeichnung; ein Image, das nicht sauber startet, wird beim nächsten Boot zurückgerollt.
+
+Bewusst offen bzw. nicht abgedeckt:
+
+- Lesende Zugriffe (Live-Werte, Einheiten, Export) sind im WLAN ohne Passwort möglich.
+- Kein TLS auf dem Gerät: Gerätepasswort und WLAN-Eingaben gehen im lokalen Netz im Klartext über die Leitung.
+- WLAN-, MQTT- und Arena-Zugangsdaten liegen unverschlüsselt im Flash (keine Flash-Verschlüsselung, kein Secure Boot); wer das Gerät in der Hand hat, kann sie auslesen und beliebige Firmware flashen.
+- MQTT ohne `mqtts://` überträgt Zugangsdaten im Klartext; `mqtts://` prüft gegen öffentliche Zertifizierungsstellen, selbstsignierte Broker-Zertifikate werden nicht akzeptiert.
+
+## Tests
+
+```bash
+sh firmware/test/host/run.sh          # Speicher, Eingabeprüfung, MQTT-Discovery (ohne Hardware)
+pip install -r server/requirements.txt -r legacy/docker/requirements.txt httpx pyyaml
+python tests/run_all.py               # Arena (und der alte Tracker als Gegenstelle)
+```
+
 ## Arena (Mehrspieler)
 
 Nur wer die Arena **betreibt**, braucht Docker:
@@ -70,13 +95,13 @@ Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tra
 | `firmware/src/uplink.c` | WebSocket-Client zur Arena inkl. Backfill |
 | `firmware/web/` | Oberfläche (wird beim Build gzip-komprimiert in die Firmware eingebettet) |
 | `server/` | Arena-Server (unverändert) |
-| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container |
+| `firmware/test/host/` | Tests, die ohne Hardware auf dem PC laufen |
+| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container (unverändert, nicht Teil des Reviews) |
 
 ## Stand und Grenzen
 
 - Die Firmware **kompiliert** (ESP-IDF 6.1 via PlatformIO), die Speicherlogik ist auf dem Host getestet. **Auf echter Hardware noch nicht getestet**: USB-Anbindung der S4, Captive Portal, TLS zur Arena und OTA sollten zuerst einzeln geprüft werden.
 - Ältere Daten aus dem Tracker (SQLite) werden nicht übernommen.
 - MQTT: Die Discovery-Nachrichten sind auf dem Host auf gültiges JSON geprüft, aber nicht gegen einen echten Broker/HA. Ein Home-Assistant-Dashboard liefert der Fork nicht mit; das baut sich jeder selbst aus den Discovery-Entitäten.
-- Das Fallback-WLAN-Passwort ist ein Standardwert (`waterrower`); änderbar über den NVS-Schlüssel `ap_pass`.
 - Excel-Export ohne Diagramm (nur Tabellen); der alte Server-Export enthielt zusätzlich ein Diagramm.
 - Der ESP hält maximal 4 gleichzeitige Live-Ansichten.

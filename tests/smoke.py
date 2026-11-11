@@ -616,8 +616,9 @@ with TestClient(main.app) as c:
     # have to say it properly, not just the one that was bitten last.
     import pathlib
     root = pathlib.Path(REPO)
-    for which in ("server", "docker"):
-        css = (root / which / "app" / "static" / "style.css").read_text(encoding="utf-8")
+    for which, path in (("server", root / "server" / "app" / "static" / "style.css"),
+                        ("firmware", root / "firmware" / "web" / "style.css")):
+        css = path.read_text(encoding="utf-8")
         check(f"{which} hides what is hidden",
               "[hidden] { display: none !important; }" in css)
 

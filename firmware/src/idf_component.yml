@@ -1,7 +1,8 @@
+# Pinned to the versions this firmware was built with; raise them deliberately.
 dependencies:
-  espressif/usb_host_cdc_acm: "^2.0.0"
-  espressif/esp_websocket_client: "*"
-  espressif/mdns: "*"
-  joltwallet/littlefs: "*"
-  espressif/cjson: "*"
-  espressif/mqtt: "*"
+  espressif/usb_host_cdc_acm: "~2.4.1"
+  espressif/esp_websocket_client: "~1.8.0"
+  espressif/mdns: "~1.15.1"
+  espressif/mqtt: "~1.1.0"
+  espressif/cjson: "~1.7.19"
+  joltwallet/littlefs: "~1.23.1"

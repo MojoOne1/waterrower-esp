@@ -17,7 +17,7 @@ PY = sys.executable
 REPO = os.path.dirname(HERE)
 PORT = 8791
 
-sys.path.insert(0, os.path.join(REPO, "docker", "app"))
+sys.path.insert(0, os.path.join(REPO, "legacy", "docker", "app"))
 from db import Database          # noqa: E402  the tracker's
 from uplink import Uplink        # noqa: E402
 

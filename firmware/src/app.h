@@ -55,10 +55,11 @@ typedef struct {
     float    avg_speed_ms, avg_spm;
     uint8_t  spark[40];                  /* speed, 0.1 m/s steps, 0..25.5 */
     uint8_t  spark_n;
+    uint8_t  synced;                     /* delivered to the configured arena */
 } sum_t;
 
 void  store_init(void);
-void  store_recover(const char *active_id);          /* close orphaned files */
+void  store_recover(void);                           /* close orphaned files after a power cut */
 void *store_open_session(const char *id);            /* append handle */
 void  store_append(void *h, const sample_t *s);
 void  store_flush(void *h);
@@ -66,12 +67,14 @@ void  store_close_handle(void *h);
 bool  store_write_summary(const sum_t *s);
 bool  store_read_summary(const char *id, sum_t *out, bool *has_file);
 bool  store_summarize(const char *id, sum_t *out);   /* from the samples */
-int   store_list_ids(char (*ids)[24], int max);      /* newest first */
+int   store_list_ids(char (**ids)[24]);              /* newest first; caller frees *ids */
 bool  store_delete(const char *id);
 bool  store_exists(const char *id);
 FILE *store_open_samples(const char *id);            /* read, caller closes */
 void  store_make_room(void);
 void  store_info(size_t *total, size_t *used);
+void  store_set_synced(const char *id, bool synced);
+void  store_clear_synced_all(void);
 int   sum_to_json(const sum_t *s, bool sparkline, char *buf, size_t len);
 
 /* ---- rower (S4 link + sessions) ---------------------------------------- */
@@ -86,6 +89,8 @@ void wifi_mgr_init(void);
 bool wifi_mgr_connected(void);
 bool wifi_mgr_ap_active(void);
 void wifi_mgr_set_credentials(const char *ssid, const char *pass);
+bool wifi_mgr_set_ap_password(const char *pass);     /* 8..63 chars */
+bool wifi_mgr_ap_default_password(void);
 int  wifi_mgr_status_json(char *buf, size_t len);
 int  wifi_mgr_scan_json(char *buf, size_t len);
 void wifi_mgr_apply_tz(void);
@@ -93,8 +98,9 @@ void wifi_mgr_apply_tz(void);
 /* ---- arena uplink ------------------------------------------------------ */
 void uplink_init(void);
 void uplink_reconfigure(void);
-void uplink_sample(const char *sid, uint32_t started_at, const sample_t *s);
-void uplink_summary(const sum_t *s);
+bool uplink_sample(const char *sid, uint32_t started_at, const sample_t *s);
+void uplink_summary(const sum_t *s, bool complete);  /* complete: streamed live from the first sample */
+bool uplink_connected(void);
 int  uplink_status_json(char *buf, size_t len);
 
 /* ---- MQTT (optional, Home Assistant discovery) -------------------------- */

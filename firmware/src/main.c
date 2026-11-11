@@ -1,5 +1,6 @@
 #include "app.h"
 #include "esp_log.h"
+#include "esp_ota_ops.h"
 
 void app_main(void)
 {
@@ -12,4 +13,7 @@ void app_main(void)
     web_start();
     uplink_init();
     mqtt_init();
+    /* Everything came up: keep this image. One that crashes before this
+       point is rolled back to the previous one by the bootloader. */
+    esp_ota_mark_app_valid_cancel_rollback();
 }

@@ -49,7 +49,7 @@ LOG = open(os.path.join(tmp, "server.log"), "w+")
 server = subprocess.Popen(
     [PY, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", str(PORT),
      "--log-level", "warning"],
-    cwd=os.path.join(REPO, "docker", "app"), env=env,
+    cwd=os.path.join(REPO, "legacy", "docker", "app"), env=env,
     stdout=LOG, stderr=subprocess.STDOUT)
 
 base = f"http://127.0.0.1:{PORT}"
@@ -154,7 +154,7 @@ try:
     server2 = subprocess.Popen(
         [PY, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", str(PORT + 1),
          "--log-level", "warning"],
-        cwd=os.path.join(REPO, "docker", "app"),
+        cwd=os.path.join(REPO, "legacy", "docker", "app"),
         env=dict(env, DB_PATH=os.path.join(tmp, "t2.db"),
                  FIRMWARE_YAML_URL="http://example.com/waterrower.yaml"),
         stdout=LOG, stderr=subprocess.STDOUT)

@@ -30,6 +30,8 @@ services:
       ARENA_SECURE_COOKIES: "${ARENA_SECURE_COOKIES:-1}"
     volumes:
       - ./server/data:/data
+    security_opt:
+      - no-new-privileges:true
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -39,3 +41,5 @@ services:
       TUNNEL_TOKEN: "${TUNNEL_TOKEN:?put TUNNEL_TOKEN in .env}"
     depends_on:
       - arena
+    security_opt:
+      - no-new-privileges:true

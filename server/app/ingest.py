@@ -43,6 +43,47 @@ PING_S = 20          # Cloudflare drops an idle tunnel; this keeps it warm
 MAX_BACKFILL_ROWS = 20000
 
 
+def _num(value, lo: float = 0.0, hi: float = 1e7):
+    """A finite number inside a sane range, or None.
+
+    Everything a tracker sends ends up in the database and from there in
+    other people's browsers. A device token only proves who the tracker
+    belongs to, not that it is well behaved - so text, booleans, NaN and
+    absurd figures stop here instead of being stored as they came.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    if value != value or not lo <= value <= hi:
+        return None
+    return value
+
+
+_FIELDS = ("distance_m", "speed_ms", "stroke_rate", "strokes", "watts")
+
+
+def _clean(row) -> dict:
+    """The numeric fields of a sample or summary, and nothing else."""
+    if not isinstance(row, dict):
+        return {}
+    out = {k: _num(row.get(k)) for k in _FIELDS}
+    for k in ("t", "duration_s"):
+        if k in row:
+            out[k] = int(_num(row.get(k), 0, 7 * 86400) or 0)
+    for k in ("avg_speed_ms", "avg_spm"):
+        if k in row:
+            out[k] = _num(row.get(k), 0, 1000) or 0
+    for k in ("distance_m", "strokes"):
+        if out[k] is not None:
+            out[k] = int(out[k])
+    return out
+
+
+def _when(value, fallback: float) -> float:
+    """A timestamp from the tracker, or the fallback when it is not one."""
+    v = _num(value, 0, 4102444800)          # up to the year 2100
+    return float(v) if v else fallback
+
+
 async def uplink_endpoint(websocket: WebSocket, db, hub) -> None:
     ip = websocket.client.host if websocket.client else "?"
     # Guessing a 256-bit token is hopeless, so this is not about guessing:
@@ -136,27 +177,39 @@ async def _session_key(db, athlete: dict, remote_id: str, started_at: float,
     return seen[remote_id]
 
 
+def _remote_id(msg: dict) -> str:
+    """The tracker's own name for a session: short printable text, or nothing."""
+    rid = msg.get("session")
+    if not isinstance(rid, str) or not 0 < len(rid) <= 64 or not rid.isprintable():
+        return ""
+    return rid
+
+
 async def _handle(msg: dict, athlete: dict, db, hub, websocket: WebSocket,
                   seen: dict[str, int]) -> None:
     kind = msg.get("type")
 
+    if not isinstance(msg, dict):
+        return
+
     if kind == "sample":
-        remote_id = str(msg.get("session") or "")
+        remote_id = _remote_id(msg)
         if not remote_id:
             return
-        t = int(msg.get("t") or 0)
-        started_at = float(msg.get("started_at") or (time.time() - t))
+        data = _clean(msg)
+        t = data.get("t", 0)
+        started_at = _when(msg.get("started_at"), time.time() - t)
         session_id = await _session_key(db, athlete, remote_id, started_at, seen)
-        await asyncio.to_thread(db.add_sample, session_id, t, time.time(), msg)
-        hub.on_sample(athlete["id"], remote_id, session_id, t, msg)
+        await asyncio.to_thread(db.add_sample, session_id, t, time.time(), data)
+        hub.on_sample(athlete["id"], remote_id, session_id, t, data)
 
     elif kind == "summary":
-        remote_id = str(msg.get("session") or "")
+        remote_id = _remote_id(msg)
         if not remote_id:
             return
-        started_at = float(msg.get("started_at") or time.time())
+        started_at = _when(msg.get("started_at"), time.time())
         session_id = await _session_key(db, athlete, remote_id, started_at, seen)
-        await asyncio.to_thread(db.close_session, session_id, time.time(), msg)
+        await asyncio.to_thread(db.close_session, session_id, time.time(), _clean(msg))
         await asyncio.to_thread(records.index_session, db, session_id)
         hub.on_session_end(athlete["id"], session_id)
         stored = await asyncio.to_thread(db.session, session_id)
@@ -165,16 +218,17 @@ async def _handle(msg: dict, athlete: dict, db, hub, websocket: WebSocket,
         log.info("Session closed: %s / %s", athlete["name"], remote_id)
 
     elif kind == "backfill":
-        remote_id = str(msg.get("session") or "")
-        rows = msg.get("samples") or []
-        if not remote_id or len(rows) > MAX_BACKFILL_ROWS:
+        remote_id = _remote_id(msg)
+        rows = msg.get("samples")
+        if not remote_id or not isinstance(rows, list) or len(rows) > MAX_BACKFILL_ROWS:
             await websocket.send_json({"type": "ack", "session": remote_id, "stored": False})
             return
-        started_at = float(msg.get("started_at") or time.time())
+        rows = [_clean(r) for r in rows if isinstance(r, dict)]
+        started_at = _when(msg.get("started_at"), time.time())
         session_id = await _session_key(db, athlete, remote_id, started_at, seen)
         await asyncio.to_thread(db.add_samples, session_id, rows)
-        summary = msg.get("summary") or {}
-        ended_at = float(msg.get("ended_at") or started_at + float(summary.get("duration_s") or 0))
+        summary = _clean(msg.get("summary"))
+        ended_at = _when(msg.get("ended_at"), started_at + float(summary.get("duration_s") or 0))
         await asyncio.to_thread(db.close_session, session_id, ended_at, summary)
         await asyncio.to_thread(records.index_session, db, session_id)
         await websocket.send_json({"type": "ack", "session": remote_id, "stored": True})

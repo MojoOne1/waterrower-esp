@@ -18,7 +18,8 @@
 
 static const char *TAG = "rower";
 
-static cdc_acm_dev_hdl_t dev;
+static cdc_acm_dev_hdl_t dev;          /* owned by the rower task */
+static volatile bool dev_gone;         /* set by the USB event callback */
 static StreamBufferHandle_t rx_sb;
 static QueueHandle_t cmd_q;
 
@@ -37,7 +38,8 @@ static size_t rx_len;
 /* ---- session ----------------------------------------------------------- */
 static char sid[24];
 static void *shandle;
-static uint32_t s_started, s_last_flush_ms;
+static uint32_t s_started, s_start_ms, s_last_flush_ms;
+static bool s_clock_ok, s_live_complete;
 static double sum_speed, sum_spm;
 static uint32_t n_samples;
 
@@ -82,9 +84,7 @@ static bool on_rx(const uint8_t *data, size_t len, void *arg)
 static void on_dev_event(const cdc_acm_host_dev_event_data_t *ev, void *arg)
 {
     if (ev->type == CDC_ACM_HOST_DEVICE_DISCONNECTED) {
-        ESP_LOGW(TAG, "S4 USB device gone");
-        cdc_acm_host_close(ev->data.cdc_hdl);
-        dev = NULL;
+        dev_gone = true;        /* closed by the rower task, which may be mid-transfer right now */
     } else if (ev->type == CDC_ACM_HOST_ERROR) {
         ESP_LOGW(TAG, "CDC error %d", ev->data.error);
     }
@@ -114,6 +114,7 @@ static void try_open(void)
         cdc_acm_line_coding_t lc = { .dwDTERate = 19200, .bCharFormat = 0, .bParityType = 0, .bDataBits = 8 };
         cdc_acm_host_line_coding_set(h, &lc);
         cdc_acm_host_set_control_line_state(h, true, true);
+        dev_gone = false;
         dev = h;
     }
 }
@@ -140,6 +141,8 @@ static void handshake(void)
     s4_write("IV?\r\n");
 }
 
+static void drain(TickType_t wait);
+
 /* ---- session ----------------------------------------------------------- */
 static void start_session(void)
 {
@@ -152,12 +155,20 @@ static void start_session(void)
     } else {
         snprintf(buf, sizeof buf, "boot-%u", (unsigned) (now_ms() / 1000));
     }
+    /* An ID that already exists (same second, or "boot-N" after a reboot) must
+       not be appended to: that would merge two workouts into one file. */
+    char id[24];
+    snprintf(id, sizeof id, "%.20s", buf);
+    for (int k = 2; store_exists(id) && k < 100; k++) snprintf(id, sizeof id, "%.20s-%d", buf, k);
     store_make_room();
-    shandle = store_open_session(buf);
+    shandle = store_open_session(id);
     if (!shandle) { ESP_LOGE(TAG, "cannot open session file"); return; }
-    snprintf(sid, sizeof sid, "%.23s", buf);
+    strcpy(sid, id);
+    s_clock_ok = time_valid();
+    s_live_complete = s_clock_ok && uplink_connected();   /* else: backfill it afterwards */
     s_started = epoch_or_uptime();
-    s_last_flush_ms = now_ms();
+    s_start_ms = now_ms();
+    s_last_flush_ms = s_start_ms;
     sum_speed = sum_spm = 0; n_samples = 0;
     session_active = true;
     ESP_LOGI(TAG, "session start %s", sid);
@@ -172,9 +183,16 @@ static void end_session(void)
     shandle = NULL;
     sum_t s;
     if (store_summarize(sid, &s)) {
+        /* The clock may have been set while rowing (NTP, or the browser): date
+           the session from its end instead of from an uptime counter. */
+        if (!s_clock_ok && time_valid()) {
+            uint32_t len = (now_ms() - s_start_ms) / 1000;
+            s.ended_at = (uint32_t) time(NULL);
+            s_started = s.ended_at - len;
+        }
         s.started_at = s_started;
         store_write_summary(&s);
-        uplink_summary(&s);
+        uplink_summary(&s, s_live_complete);
         char lj[200];
         snprintf(lj, sizeof lj,
             "{\"session_id\":\"%s\",\"distance_m\":%u,\"duration_s\":%u,\"strokes\":%u,\"avg_speed_ms\":%.2f,\"avg_spm\":%.1f}",
@@ -184,15 +202,15 @@ static void end_session(void)
     } else {
         store_delete(sid);
     }
-    poll_slow();
-    vTaskDelay(pdMS_TO_TICKS(300));
+    poll_slow();                                 /* final lifetime distance */
+    drain(pdMS_TO_TICKS(300));
     publish();
 }
 
 static void record_sample(void)
 {
     sample_t s = {
-        .ts = epoch_or_uptime(),
+        .ts = s_started + (now_ms() - s_start_ms) / 1000,   /* monotonic: immune to clock steps */
         .distance_m = (uint16_t) v.distance_m,
         .speed_cms = (uint16_t) v.speed_cms,
         .strokes = (uint16_t) v.strokes,
@@ -202,7 +220,7 @@ static void record_sample(void)
     };
     sum_speed += v.speed_cms; sum_spm += v.stroke_rate; n_samples++;
     store_append(shandle, &s);
-    uplink_sample(sid, s_started, &s);
+    if (!uplink_sample(sid, s_started, &s)) s_live_complete = false;   /* a gap: the arena gets it whole later */
     if (now_ms() - s_last_flush_ms > 10000) { store_flush(shandle); s_last_flush_ms = now_ms(); }
 }
 
@@ -220,7 +238,7 @@ static void mark_activity(bool stroke_start)
 static void process_line(const char *line, size_t n)
 {
     last_rx_ms = now_ms();
-    if (!strcmp(line, "SS") || !strcmp(line, "SE") || (n == 3 && line[0] == 'P' && strcmp(line, "PING"))) {
+    if (!strcmp(line, "SS") || !strcmp(line, "SE") || (n == 3 && line[0] == 'P')) {
         mark_activity(!strcmp(line, "SS"));
         return;
     }
@@ -328,6 +346,12 @@ static void rower_task(void *arg)
     uint32_t next = now_ms() + 1000;
     while (1) {
         static uint32_t last_open_ms;
+        if (dev && dev_gone) {
+            ESP_LOGW(TAG, "S4 USB device gone");
+            cdc_acm_host_close(dev);
+            dev = NULL;
+            rx_len = 0;
+        }
         if (!dev && now_ms() - last_open_ms > 2000) { last_open_ms = now_ms(); try_open(); }
         drain(pdMS_TO_TICKS(50));
         rower_cmd_t c;
@@ -358,7 +382,7 @@ void rower_init(void)
     rx_sb = xStreamBufferCreate(2048, 1);
     cmd_q = xQueueCreate(4, sizeof(rower_cmd_t));
     timeout_min = settings_get_i32("sess_to", 5);
-    store_recover(NULL);
+    store_recover();
 
     const usb_host_config_t host_cfg = { .skip_phy_setup = false, .intr_flags = ESP_INTR_FLAG_LEVEL1 };
     ESP_ERROR_CHECK(usb_host_install(&host_cfg));

@@ -22,8 +22,9 @@
 static const char *TAG = "wifi";
 #define TZ_DEFAULT "CET-1CEST,M3.5.0,M10.5.0/3"
 #define AP_IP_STR  "192.168.4.1"
+#define AP_DEFAULT_PASS "waterrower"
 
-static bool sta_up, ap_on, have_creds;
+static volatile bool sta_up, ap_on, have_creds, scanning;
 static esp_timer_handle_t t_ap_start, t_ap_stop, t_reconnect;
 static esp_netif_t *sta_netif, *ap_netif;
 static char ap_ssid[32];
@@ -39,19 +40,47 @@ void wifi_mgr_apply_tz(void)
     tzset();
 }
 
+static void ap_password(char *pass, size_t n)
+{
+    /* Never an open network: anything shorter than WPA2 allows falls back to the default. */
+    if (!settings_get_str("ap_pass", pass, n) || strlen(pass) < 8) snprintf(pass, n, "%s", AP_DEFAULT_PASS);
+}
+
+bool wifi_mgr_ap_default_password(void)
+{
+    char pass[65];
+    ap_password(pass, sizeof pass);
+    return strcmp(pass, AP_DEFAULT_PASS) == 0;
+}
+
+static void apply_ap_config(void)
+{
+    char pass[65];
+    ap_password(pass, sizeof pass);
+    wifi_config_t ap = {0};
+    memcpy(ap.ap.ssid, ap_ssid, strnlen(ap_ssid, sizeof ap.ap.ssid));
+    ap.ap.ssid_len = strnlen(ap_ssid, sizeof ap.ap.ssid);
+    memcpy(ap.ap.password, pass, strnlen(pass, sizeof ap.ap.password - 1));
+    ap.ap.max_connection = 4;
+    ap.ap.authmode = WIFI_AUTH_WPA2_PSK;
+    ap.ap.pmf_cfg.required = false;
+    esp_wifi_set_config(WIFI_IF_AP, &ap);
+}
+
+bool wifi_mgr_set_ap_password(const char *pass)
+{
+    size_t l = pass ? strlen(pass) : 0;
+    if (l < 8 || l > 63) return false;
+    settings_set_str("ap_pass", pass);
+    if (ap_on) apply_ap_config();
+    return true;
+}
+
 static void start_ap(void)
 {
     if (ap_on) return;
-    char pass[64];
-    if (!settings_get_str("ap_pass", pass, sizeof pass)) strcpy(pass, "waterrower");
-    wifi_config_t ap = {0};
-    strncpy((char *) ap.ap.ssid, ap_ssid, sizeof ap.ap.ssid);
-    ap.ap.ssid_len = strlen(ap_ssid);
-    strncpy((char *) ap.ap.password, pass, sizeof ap.ap.password);
-    ap.ap.max_connection = 4;
-    ap.ap.authmode = strlen(pass) >= 8 ? WIFI_AUTH_WPA2_PSK : WIFI_AUTH_OPEN;
     esp_wifi_set_mode(WIFI_MODE_APSTA);
-    esp_wifi_set_config(WIFI_IF_AP, &ap);
+    apply_ap_config();
     ap_on = true;
     ESP_LOGW(TAG, "fallback AP \"%s\" up, open http://" AP_IP_STR "/", ap_ssid);
 }
@@ -74,7 +103,10 @@ static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         if (have_creds) esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         sta_up = false;
-        if (have_creds) esp_timer_start_once(t_reconnect, 4000000);
+        /* A station that keeps scanning drags the access point off its channel
+           and makes the setup page unreachable - retry slowly while it is up. */
+        esp_timer_stop(t_reconnect);
+        if (have_creds && !scanning) esp_timer_start_once(t_reconnect, ap_on ? 30000000 : 4000000);
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         sta_up = true;
         ip_event_got_ip_t *e = data;
@@ -97,6 +129,9 @@ static void dns_task(void *arg)
         struct sockaddr_in from; socklen_t fl = sizeof from;
         int n = recvfrom(s, buf, sizeof buf - 16, 0, (struct sockaddr *) &from, &fl);
         if (n < 12 || !ap_on) continue;
+        if ((buf[2] & 0xF8) != 0 || buf[4] != 0 || buf[5] != 1) continue;   /* one standard query only */
+        /* Only answer clients of the access point, never the home network. */
+        if ((ntohl(from.sin_addr.s_addr) & 0xFFFFFF00u) != 0xC0A80400u) continue;
         buf[2] = 0x81; buf[3] = 0x80;       /* response, recursion available */
         buf[6] = 0; buf[7] = 1;             /* one answer */
         buf[8] = buf[9] = buf[10] = buf[11] = 0;
@@ -139,9 +174,9 @@ void wifi_mgr_init(void)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     if (have_creds) {
         wifi_config_t sta = {0};
-        strncpy((char *) sta.sta.ssid, ssid, sizeof sta.sta.ssid);
-        strncpy((char *) sta.sta.password, pass, sizeof sta.sta.password);
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta));
+        memcpy(sta.sta.ssid, ssid, strnlen(ssid, sizeof sta.sta.ssid));
+        memcpy(sta.sta.password, pass, strnlen(pass, sizeof sta.sta.password));
+        if (esp_wifi_set_config(WIFI_IF_STA, &sta) != ESP_OK) have_creds = false;   /* unusable -> setup AP */
     }
     ESP_ERROR_CHECK(esp_wifi_start());
 
@@ -161,47 +196,59 @@ void wifi_mgr_init(void)
 
 void wifi_mgr_set_credentials(const char *ssid, const char *pass)
 {
+    if (!ssid || !ssid[0]) return;
+    wifi_config_t sta = {0};
+    memcpy(sta.sta.ssid, ssid, strnlen(ssid, sizeof sta.sta.ssid));
+    if (pass) memcpy(sta.sta.password, pass, strnlen(pass, sizeof sta.sta.password));
     settings_set_str("wifi_ssid", ssid);
     settings_set_str("wifi_pass", pass ? pass : "");
-    have_creds = ssid && ssid[0];
-    if (!have_creds) return;
-    wifi_config_t sta = {0};
-    strncpy((char *) sta.sta.ssid, ssid, sizeof sta.sta.ssid);
-    strncpy((char *) sta.sta.password, pass ? pass : "", sizeof sta.sta.password);
-    esp_wifi_set_config(WIFI_IF_STA, &sta);
+    have_creds = true;
     sta_up = false;
+    esp_timer_stop(t_reconnect);
     esp_wifi_disconnect();
+    esp_wifi_set_config(WIFI_IF_STA, &sta);
     esp_wifi_connect();
 }
 
 int wifi_mgr_status_json(char *buf, size_t len)
 {
-    char raw[33] = "", ssid[80], tz[64];
-    settings_get_str("wifi_ssid", raw, sizeof raw);
+    char raw[65] = "", ssid[200], tz[140], aps[80];
+    settings_get_str("wifi_ssid", raw, 33);
     json_esc(ssid, sizeof ssid, raw);
-    if (!settings_get_str("tz", tz, sizeof tz)) strcpy(tz, TZ_DEFAULT);
+    if (!settings_get_str("tz", raw, sizeof raw)) strcpy(raw, TZ_DEFAULT);
+    json_esc(tz, sizeof tz, raw);
+    json_esc(aps, sizeof aps, ap_ssid);
     esp_netif_ip_info_t ip = {0};
     if (sta_up) esp_netif_get_ip_info(sta_netif, &ip);
     wifi_ap_record_t ap = {0};
     int rssi = (sta_up && esp_wifi_sta_get_ap_info(&ap) == ESP_OK) ? ap.rssi : 0;
     return snprintf(buf, len,
         "{\"ssid\":\"%s\",\"connected\":%s,\"ip\":\"" IPSTR "\",\"rssi\":%d,"
-        "\"ap_active\":%s,\"ap_ssid\":\"%s\",\"tz\":\"%s\",\"session_timeout_min\":%d}",
+        "\"ap_active\":%s,\"ap_ssid\":\"%s\",\"ap_default_password\":%s,\"tz\":\"%s\",\"session_timeout_min\":%d}",
         ssid, sta_up ? "true" : "false", IP2STR(&ip.ip), rssi,
-        ap_on ? "true" : "false", ap_ssid, tz, settings_get_i32("sess_to", 5));
+        ap_on ? "true" : "false", aps, wifi_mgr_ap_default_password() ? "true" : "false",
+        tz, settings_get_i32("sess_to", 5));
 }
 
 int wifi_mgr_scan_json(char *buf, size_t len)
 {
     wifi_scan_config_t sc = { .show_hidden = false };
-    int n = 0;
     uint16_t cnt = 20;
-    wifi_ap_record_t recs[20];
+    static wifi_ap_record_t recs[20];
+    int n = 0;
+    /* A station that is busy connecting refuses to scan: pause it for the duration. */
+    scanning = true;
+    esp_timer_stop(t_reconnect);
+    if (!sta_up) esp_wifi_disconnect();
     if (esp_wifi_scan_start(&sc, true) == ESP_OK && esp_wifi_scan_get_ap_records(&cnt, recs) == ESP_OK) n = cnt;
+    else esp_wifi_clear_ap_list();
+    scanning = false;
+    if (have_creds && !sta_up) esp_timer_start_once(t_reconnect, 3000000);
+
     int o = snprintf(buf, len, "[");
-    for (int i = 0; i < n && (size_t) o < len - 80; i++) {
+    for (int i = 0; i < n && (size_t) o + 260 < len; i++) {
         if (!recs[i].ssid[0]) continue;
-        char esc[80];
+        char esc[200];
         json_esc(esc, sizeof esc, (const char *) recs[i].ssid);
         o += snprintf(buf + o, len - o, "%s{\"ssid\":\"%s\",\"rssi\":%d,\"secure\":%s}",
                       o > 1 ? "," : "", esc, recs[i].rssi,

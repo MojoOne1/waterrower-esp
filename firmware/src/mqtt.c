@@ -58,6 +58,7 @@ static char host[100], user[64], pass[64], prefix[48], disc[32], devid[24], last
 static int port;
 static char cache[E_COUNT][200];
 static uint32_t last_seq, last_beat;
+static int64_t last_live_us;
 
 static void load_cfg(void)
 {
@@ -77,7 +78,7 @@ static void pub(const char *sub, const char *payload, bool retain)
 {
     char t[160];
     snprintf(t, sizeof t, "%s/%s", prefix, sub);
-    esp_mqtt_client_enqueue(client, t, payload, 0, 0, retain, false);
+    esp_mqtt_client_enqueue(client, t, payload, 0, 0, retain, true);
 }
 
 /* ---- values -------------------------------------------------------------- */
@@ -128,7 +129,9 @@ static void publish_states(bool force)
         strcpy(cache[i], v);
         pub(ENTS[i].topic, v, ENTS[i].retain);
     }
-    if (l.session_active) {
+    /* One sample a second, however often the state changes (race updates do, twice a second). */
+    if (l.session_active && esp_timer_get_time() - last_live_us >= 900000) {
+        last_live_us = esp_timer_get_time();
         char j[240];
         snprintf(j, sizeof j,
             "{\"session_id\":\"%s\",\"distance_m\":%d,\"speed_ms\":%.2f,\"stroke_rate\":%d,\"strokes\":%d,"
@@ -174,7 +177,7 @@ static void publish_discovery(void)
         ap(b, sizeof b, &n,
            ",\"device\":{\"identifiers\":[\"%s\"],\"name\":\"WaterRower\",\"manufacturer\":\"WaterRower\","
            "\"model\":\"S4 USB bridge (ESP32-S3)\",\"sw_version\":\"%s\"}}", devid, FW_VERSION);
-        esp_mqtt_client_enqueue(client, topic, b, 0, 0, true, false);
+        esp_mqtt_client_enqueue(client, topic, b, 0, 1, true, true);
         vTaskDelay(pdMS_TO_TICKS(40));                       /* do not flood the broker */
     }
     ESP_LOGI(TAG, "discovery published (%d entities)", E_COUNT);
@@ -297,14 +300,16 @@ void mqtt_reconfigure(void) { reconf = true; }
 
 int mqtt_status_json(char *buf, size_t len)
 {
-    char h[220], p[80];
+    char h[330], p[160], u[200], e[200];
     json_esc(h, sizeof h, host);
     json_esc(p, sizeof p, prefix);
+    json_esc(u, sizeof u, user);
+    json_esc(e, sizeof e, last_error);
     return snprintf(buf, len,
         "{\"enabled\":%s,\"host\":\"%s\",\"port\":%d,\"username\":\"%s\",\"password\":\"%s\",\"prefix\":\"%s\","
         "\"discovery\":%s,\"connected\":%s,\"error\":\"%s\"}",
-        enabled ? "true" : "false", h, port, user, pass[0] ? "••••••" : "", p,
-        discovery ? "true" : "false", connected ? "true" : "false", last_error);
+        enabled ? "true" : "false", h, port, u, pass[0] ? "••••••" : "", p,
+        discovery ? "true" : "false", connected ? "true" : "false", e);
 }
 
 void mqtt_init(void)

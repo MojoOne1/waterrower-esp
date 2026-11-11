@@ -184,6 +184,9 @@ const locale = () => I18N[lang].locale;
 
 
 Object.assign(I18N.de, {
+  labelApPass: "Hotspot-Passwort", labelAdminPass: "Gerätepasswort", adminClear: "Gerätepasswort entfernen",
+  secNoPw: "Kein Gerätepasswort gesetzt: Jeder im WLAN kann Einstellungen ändern und Firmware einspielen.",
+  secApDefault: "Der Hotspot nutzt noch das Standardpasswort.",
   mqttTitle: "MQTT / Home Assistant", mqttEnabled: "MQTT aktiv", mqttDiscovery: "Home-Assistant-Discovery senden", mqttOff: "MQTT ist aus",
   mqttHint: "Topics wie bisher (<code>waterrower/…</code>). Mit Discovery erscheint das Gerät „WaterRower“ von selbst in Home Assistant.",
   connecting: "verbinde …", connOff: "Keine Verbindung zum Gerät", connOn: "Bereit", connLost: "Verbindung verloren, versuche erneut …",
@@ -198,6 +201,9 @@ Object.assign(I18N.de, {
   fwConfirm: (n) => `${n} installieren? Das Gerät startet danach neu.`, fwUploading: "Lade hoch …", fwDone: "Fertig, das Gerät startet neu …",
 });
 Object.assign(I18N.en, {
+  labelApPass: "Hotspot password", labelAdminPass: "Device password", adminClear: "Remove the device password",
+  secNoPw: "No device password set: anyone on the WiFi can change settings and install firmware.",
+  secApDefault: "The hotspot still uses the default password.",
   mqttTitle: "MQTT / Home Assistant", mqttEnabled: "MQTT enabled", mqttDiscovery: "Send Home Assistant discovery", mqttOff: "MQTT is off",
   mqttHint: "Topics as before (<code>waterrower/…</code>). With discovery the “WaterRower” device shows up in Home Assistant on its own.",
   connecting: "connecting …", connOff: "No connection to the device", connOn: "Ready", connLost: "Connection lost, retrying …",
@@ -755,7 +761,16 @@ async function loadSettings() {
   settingsForm.elements.tz.value = sys.tz || "";
   settingsForm.elements.session_timeout_min.value = sys.session_timeout_min || 5;
   renderWifi(s);
+  renderSecurity(s);
   if (!s.connected && s.ap_active) showSettings(true);
+}
+
+function renderSecurity(s) {
+  $("admin-clear-row").hidden = !s.password_set;
+  const notes = [];
+  if (!s.password_set) notes.push(t("secNoPw"));
+  if (s.ap_default_password) notes.push(t("secApDefault"));
+  $("sec-status").textContent = notes.join(" ");
 }
 
 $("wifi-scan").onclick = async () => {
@@ -774,8 +789,14 @@ settingsForm.onsubmit = async (e) => {
   const f = settingsForm.elements;
   const post = (url, body) => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   settingsMsg.textContent = t("formConnecting"); settingsMsg.className = "form-msg";
-  const r1 = await post("/api/system", { tz: f.tz.value.trim(), session_timeout_min: Number(f.session_timeout_min.value) || 5 });
-  if (!r1.ok) { settingsMsg.textContent = t("saveFailed"); settingsMsg.className = "form-msg err"; return; }
+  const sys = { tz: f.tz.value.trim(), session_timeout_min: Number(f.session_timeout_min.value) || 5 };
+  if (f.ap_password.value) sys.ap_password = f.ap_password.value;
+  if (f.admin_clear.checked) sys.admin_password = "";
+  else if (f.admin_password.value) sys.admin_password = f.admin_password.value;
+  const r1 = await post("/api/system", sys);
+  if (!r1.ok) { settingsMsg.textContent = (await r1.json().catch(() => ({}))).detail || t("saveFailed"); settingsMsg.className = "form-msg err"; return; }
+  renderSecurity(await r1.json());
+  f.ap_password.value = ""; f.admin_password.value = ""; f.admin_clear.checked = false;
   const before = await (await fetch("/api/wifi")).json();
   if (f.ssid.value.trim() && (f.password.value || f.ssid.value.trim() !== before.ssid)) {
     const r2 = await post("/api/wifi", { ssid: f.ssid.value.trim(), password: f.password.value });
@@ -890,6 +911,9 @@ $("fw-file").onchange = async (e) => {
   if (!confirm(t("fwConfirm", file.name))) return;
   msg.textContent = t("fwUploading"); msg.className = "form-msg";
   try {
+    // Ask for the device password (if one is set) before the megabyte goes out.
+    const a = await fetch("/api/auth", { method: "POST" });
+    if (!a.ok) throw new Error((await a.json().catch(() => ({}))).detail || t("saveFailed"));
     const r = await fetch("/api/ota", { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: file });
     if (!r.ok) throw new Error((await r.json()).detail || t("saveFailed"));
     msg.textContent = t("fwDone"); msg.className = "form-msg ok";

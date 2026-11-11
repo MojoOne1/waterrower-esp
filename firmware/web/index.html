@@ -40,7 +40,11 @@
       <label><span data-i18n="labelWifiPass"></span> <input name="password" type="password" autocomplete="new-password" data-i18n-placeholder="phKeep"></label>
       <label><span data-i18n="labelTz"></span> <input name="tz"></label>
       <label><span data-i18n="labelTimeout"></span> <input name="session_timeout_min" type="number" min="1" max="60"></label>
+      <label><span data-i18n="labelApPass"></span> <input name="ap_password" type="password" autocomplete="new-password" minlength="8" maxlength="63" data-i18n-placeholder="phKeep"></label>
+      <label><span data-i18n="labelAdminPass"></span> <input name="admin_password" type="password" autocomplete="new-password" minlength="8" maxlength="99" data-i18n-placeholder="phKeep"></label>
+      <label class="check" id="admin-clear-row" hidden><input name="admin_clear" type="checkbox"> <span data-i18n="adminClear"></span></label>
     </div>
+    <p class="hint" id="sec-status"></p>
     <p class="hint" id="wifi-status"></p>
     <p class="hint" data-i18n-html="settingsHint"></p>
     <div class="form-foot">

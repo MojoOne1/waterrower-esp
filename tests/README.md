@@ -1,10 +1,15 @@
 # Tests
 
+These cover the arena server. `integration.py` and `tracker_api.py` drive the
+old tracker in `legacy/docker/`, which still serves as a second, independent
+client of the arena's uplink protocol. The firmware's own host tests live in
+`firmware/test/host/`.
+
 Three suites, no framework. Each one prints a line per check and exits
 non-zero if any failed, which is all a project this size needs.
 
 ```bash
-python -m pip install -r ../server/requirements.txt -r ../docker/requirements.txt httpx pyyaml
+python -m pip install -r ../server/requirements.txt -r ../legacy/docker/requirements.txt httpx pyyaml
 python run_all.py
 ```
 
