@@ -13,14 +13,32 @@ Von der leeren Platine bis zur ersten Einheit. Vorkenntnisse sind nicht nötig.
 
 ## Hardware
 
-- **ESP32-S3-DevKitC-1, Variante N16R8** (16 MB Flash, 8 MB PSRAM). Andere Varianten haben zu wenig Speicher.
-- Ein USB-C-**Datenkabel** zum Flashen.
-- Ein **USB-C-Netzteil** (5 V) für den Dauerbetrieb.
-- Eine Verbindung vom **USB**-Port des ESP zur Mini-USB-Buchse der WaterRower S4. Der ESP arbeitet dort als USB-Host. Üblich ist ein USB-OTG-Adapter (USB-C-Stecker auf USB-A-Buchse) plus ein normales USB-A-auf-Mini-USB-Kabel. *Diese Verkabelung ist noch nicht auf echter Hardware erprobt.*
-- Die kleine **USB-OTG-Lötbrücke** auf dem Board muss geschlossen sein (Beschriftung „USB-OTG“ nahe der USB-Buchse).
-- Optional ein [Gehäuse zum Drucken](../case/).
+| Teil | Hinweis |
+|---|---|
+| ESP32-S3-DevKitC-1 (N16R8) | 16 MB Flash, 8 MB PSRAM (andere Speichervarianten reichen nicht). Zwei USB-C-Buchsen: **COM** (UART, Flashen und Strom) und **USB** (nativer OTG-Port). Verwendet: [ESP32-S3-WROOM-1 N16R8 DevKitC-1 (amazon.de)](https://www.amazon.de/dp/B0FYFF8CB2/); jeder DevKitC-1-Klon mit zwei USB-C-Buchsen und USB-OTG-Lötbrücke sollte gehen |
+| WaterRower S4 Performance Monitor | batteriebetrieben, Mini-USB-Buchse |
+| USB-C-auf-Mini-USB-Adapter | zwischen USB-C-Kabel und der Mini-USB-Buchse der S4. Verwendet: [4x USB-C-Buchse auf Mini-USB-Stecker (amazon.de)](https://www.amazon.de/dp/B0G4BYT22N); er ersetzt das Kabel der S4 |
+| USB-C-Kabel | vom **USB**-Port des ESP zu diesem Adapter |
+| USB-Netzteil (5 V) | am **COM**-Port, für den Dauerbetrieb |
+| USB-C-**Datenkabel** | zum Flashen am Computer (ein reines Ladekabel genügt nicht) |
 
-Die zwei Buchsen des Boards: **COM** (zum Flashen und für Strom) und **USB** (zur S4). Nicht verwechseln.
+Optional ein [Gehäuse zum Drucken](../case/) für die Rückseite der S4.
+
+### Die USB-OTG-Lötbrücke
+
+Auf der Unterseite des DevKitC-1-Klons gibt es eine Lötbrücke mit der Aufschrift **USB-OTG**. Sie ist ab Werk **offen** und muss **geschlossen** werden. Sie verbindet die VBUS-Leitungen beider USB-C-Buchsen: Nur dann liefert der **USB**-Port die 5 V, an denen die S4 überhaupt erkennt, dass ein Host dranhängt. Die S4 zieht darüber praktisch keinen Strom, sie läuft aus ihren eigenen Batterien.
+
+**Wichtig:** Ist die Brücke geschlossen, nie beide Buchsen gleichzeitig an getrennte Stromquellen hängen (zum Flashen am Computer also kein Netzteil am **USB**-Port).
+
+### Verkabelung
+
+```
+USB-Netzteil ──► [COM]  ESP32-S3  [USB] ──USB-C──► C-auf-Mini-Adapter ──► S4
+                                     ▲
+                         (USB-OTG-Lötbrücke geschlossen)
+```
+
+Ein USB-C-auf-USB-A-Adapter plus das Originalkabel der S4 geht genauso; der Mini-USB-Adapter spart nur ein Glied.
 
 ## Flashen
 
@@ -80,5 +98,7 @@ Per NTP, sobald Internet da ist. Sonst übernimmt der ESP die Uhrzeit vom Browse
 | Hotspot erscheint nicht | 30 s warten, ESP aus- und einstecken. Weiter: [Flashen, Fehlerhilfe](flashen.md#wenn-etwas-nicht-klappt) |
 | Einrichtungsseite öffnet sich nicht | `http://192.168.4.1/setup` von Hand eingeben, Mobile Daten aus |
 | Seite lädt nicht im Heim-WLAN | IP statt `waterrower.local` nehmen |
-| „Ergometer verbunden“ erscheint nicht | Kabel und OTG-Adapter prüfen und S4-Monitor einschalten |
 | Gerätepasswort vergessen | Neu flashen mit *Erase Flash* ([Flashen](flashen.md)); dabei gehen Einstellungen und Einheiten verloren |
+| Sensoren bleiben auf 0, kein „Ergometer verbunden“ | Der ESP sieht kein Gerät. Lötbrücke prüfen (Multimeter: ca. 5 V am VBUS-Pin der **USB**-Buchse), Adapter und Kabel auf Datenleitungen prüfen |
+| Die S4 schaltet sich nie von selbst aus | Normal und per Firmware nicht änderbar: Sobald sie 5 V am VBUS sieht und erkannt wurde, verhält sie sich wie am PC und läuft aus der USB-Spannung. Ihre 2-Minuten-Abschaltung gilt nur im Batteriebetrieb. Soll sie zwischen den Einheiten ausgehen: den ESP stromlos machen, z. B. mit einer Schaltsteckdose |
+| Einheiten haben die falsche Uhrzeit (Stunden verschoben) | Zeitzone im ESP prüfen ([Einstellungen](#einstellungen)) |

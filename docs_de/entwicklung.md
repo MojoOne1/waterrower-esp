@@ -26,6 +26,8 @@ Läuft auch in GitHub Actions (`.github/workflows/firmware.yml`), danach wird ge
 
 ## Aufbau
 
+Das Protokoll der S4 und die verwendeten Register: [S4-Protokoll](s4-protokoll.md).
+
 | Pfad | Inhalt |
 |---|---|
 | `firmware/src/rower.c` | S4-USB-Link, Protokoll-Parser, Sitzungslogik |

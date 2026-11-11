@@ -18,7 +18,40 @@ Last Will: `<präfix>/status` meldet `offline`, wenn der ESP wegfällt; alle Ent
 
 `last_session` kommt auf `<präfix>/session/last`, Live-Werte auf `<präfix>/live` und den Einzel-Topics (`waterrower/distance` usw.).
 
-Die Topics entsprechen der früheren ESPHome-Variante. Ein fertiges Dashboard gibt es nicht; das baut man sich aus den Entitäten.
+## Topics
+
+Alle unter dem Präfix (Standard `waterrower/`):
+
+| Topic | Inhalt |
+|---|---|
+| `distance` | Distanz in m |
+| `speed` | Geschwindigkeit in m/s |
+| `stroke_rate` | Schlagfrequenz |
+| `strokes` | Schlagzahl |
+| `ratio` | Verhältnis Zug/Erholung |
+| `duration` | Dauer in s |
+| `duration_formatted` | Dauer als `hh:mm:ss` |
+| `watts` | Watt |
+| `total_distance` | Gesamtdistanz in m |
+| `split_500m` | 500-m-Zeit als `m:ss` |
+| `session_active` | `ON` / `OFF` |
+| `session_id` | ID der laufenden Einheit |
+| `live` | alle Werte als JSON, 1×/s während einer Einheit |
+| `session/last` | Zusammenfassung der letzten Einheit (retained) |
+| `s4_connected` | `ON` / `OFF`: S4 ist an und per USB erkannt (retained) |
+| `usb_mode` | `ON` / `OFF`: S4 im USB-Modus und sendet (retained) |
+| `firmware_version` | Firmware-Version (retained) |
+| `cmd/end_session` | **an** den ESP: laufende Einheit beenden; Payload `reset` setzt zusätzlich den Monitor zurück |
+| `cmd/session_timeout` | **an** den ESP: Sitzungs-Timeout in Minuten (1–60) |
+| `status` | `online` / `offline` (Last Will) |
+
+Die Topics entsprechen der früheren ESPHome-Variante. Eine Ausnahme: `split_500m_s` (500-m-Zeit in Sekunden) gibt es nicht mehr.
+
+## Home-Assistant-Dashboard
+
+[`homeassistant/dashboard.yaml`](../homeassistant/dashboard.yaml) ist ein fertiges Dashboard: Live-Kacheln, Einheiten-Zusammenfassung, 24-h-Verlauf und Gerätesteuerung (Sitzungs-Timeout, Beenden-und-zurücksetzen, Versionen).
+
+Import: *Einstellungen → Dashboards → Dashboard hinzufügen → Neues Dashboard von Grund auf*, öffnen, Menü (drei Punkte) → *Bearbeiten* → Menü → *Raw-Konfigurationseditor*, Datei einfügen. Die Entitäts-IDs gehen davon aus, dass das Gerät in Home Assistant „WaterRower“ heißt (`sensor.waterrower_…`). Hat Home Assistant ein anderes Präfix vergeben, vorher `waterrower_` in der Datei ersetzen.
 
 ## Stand
 

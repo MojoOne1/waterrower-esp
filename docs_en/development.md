@@ -26,6 +26,8 @@ Also runs in GitHub Actions (`.github/workflows/firmware.yml`), followed by the 
 
 ## Code layout
 
+The S4's protocol and the registers used: [S4 protocol](s4-protocol.md).
+
 | Path | Content |
 |---|---|
 | `firmware/src/rower.c` | S4 USB link, protocol parser, session logic |

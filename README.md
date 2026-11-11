@@ -23,7 +23,7 @@ WaterRower S4 ──USB──► ESP32-S3 ──Wi-Fi──► browser (phone/PC
 - **Wi-Fi setup without reflashing:** without credentials the ESP opens a hotspot with a setup page
 - Light/dark theme, German/English, phone-friendly
 - Firmware update from the web UI (OTA)
-- **Optional:** MQTT with Home Assistant discovery, arena uplink for rowing together
+- **Optional:** MQTT with Home Assistant discovery (plus a ready-made dashboard), arena uplink for rowing together
 
 ## Quick start
 
@@ -42,6 +42,7 @@ Everything is available in English (`docs_en/`) and German (`docs_de/`).
 | **Start here:** hardware, Wi-Fi, first workout | [setup.md](docs_en/setup.md) | [einrichtung.md](docs_de/einrichtung.md) |
 | **Flashing with the browser flasher** | [flashing.md](docs_en/flashing.md) | [flashen.md](docs_de/flashen.md) |
 | Using the web UI | [usage.md](docs_en/usage.md) | [bedienung.md](docs_de/bedienung.md) |
+| S4 protocol and register addresses | [s4-protocol.md](docs_en/s4-protocol.md) | [s4-protokoll.md](docs_de/s4-protokoll.md) |
 | MQTT and Home Assistant | [mqtt-home-assistant.md](docs_en/mqtt-home-assistant.md) | [mqtt-home-assistant.md](docs_de/mqtt-home-assistant.md) |
 | Arena (multiplayer) | [arena.md](docs_en/arena.md) | [arena.md](docs_de/arena.md) |
 | Security | [security.md](docs_en/security.md) | [sicherheit.md](docs_de/sicherheit.md) |
@@ -51,7 +52,8 @@ Everything is available in English (`docs_en/`) and German (`docs_de/`).
 ## Status and limits
 
 - The firmware **compiles** (ESP-IDF 6.1 via PlatformIO) and the storage logic is tested on a PC. **Not yet tested on real hardware:** the S4 USB link, captive portal, TLS to the arena and OTA should be verified one by one first.
-- MQTT discovery is checked for valid JSON, but not against a real broker or Home Assistant.
+- MQTT discovery is checked for valid JSON, but not against a real broker or Home Assistant. A ready-made Home Assistant dashboard is in [`homeassistant/`](homeassistant/dashboard.yaml).
+- The watts and ratio registers of the S4 are not verified against the display (see [S4 protocol](docs_en/s4-protocol.md)).
 - The Excel export contains tables but no chart.
 - At most 4 simultaneous live views.
 

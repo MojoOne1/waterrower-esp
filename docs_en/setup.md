@@ -13,14 +13,32 @@ From a bare board to your first workout. No prior knowledge needed.
 
 ## Hardware
 
-- **ESP32-S3-DevKitC-1, variant N16R8** (16 MB flash, 8 MB PSRAM). Other variants have too little memory.
-- A USB-C **data cable** for flashing.
-- A **USB-C power supply** (5 V) for permanent use.
-- A connection from the ESP's **USB** port to the WaterRower S4's Mini-USB socket. The ESP acts as USB host there. A USB OTG adapter (USB-C plug to USB-A socket) plus a normal USB-A to Mini-USB cable is the usual way. *This cabling has not been tested on real hardware yet.*
-- The small **USB-OTG solder bridge** on the board must be closed (labelled "USB-OTG" near the USB socket).
-- Optionally a [printable case](../case/).
+| Part | Note |
+|---|---|
+| ESP32-S3-DevKitC-1 (N16R8) | 16 MB flash, 8 MB PSRAM (other memory variants are not enough). Two USB-C sockets: **COM** (UART, flashing and power) and **USB** (native OTG port). Used: [ESP32-S3-WROOM-1 N16R8 DevKitC-1 (amazon.de)](https://www.amazon.de/dp/B0FYFF8CB2/); any DevKitC-1 clone with two USB-C sockets and the USB-OTG solder bridge should do |
+| WaterRower S4 Performance Monitor | battery powered, Mini-USB socket |
+| USB-C to Mini-USB adapter | between a USB-C cable and the S4's Mini-USB socket. Used: [4x USB-C female to Mini-USB male (amazon.de)](https://www.amazon.de/dp/B0G4BYT22N); it replaces the S4's own cable |
+| USB-C cable | from the ESP's **USB** port to that adapter |
+| USB power supply (5 V) | on the **COM** port, for permanent use |
+| USB-C **data cable** | for flashing from a computer (a charge-only cable is not enough) |
 
-The board's two sockets: **COM** (for flashing and power) and **USB** (to the S4). Do not mix them up.
+Optionally a [printable case](../case/) for the back of the S4.
+
+### The USB-OTG solder bridge
+
+On the underside of the DevKitC-1 clone there is a solder bridge labelled **USB-OTG**. It is **open** from the factory and must be **closed**. It ties the VBUS lines of both USB-C sockets together: only then does the **USB** port carry the 5 V the S4 needs to detect a host at all. The S4 draws practically no power through it; it runs from its own batteries.
+
+**Important:** once the bridge is closed, never connect both sockets to separate power sources at the same time (so no power supply on the **USB** port while flashing from a computer).
+
+### Wiring
+
+```
+USB power supply ──► [COM]  ESP32-S3  [USB] ──USB-C──► C-to-Mini adapter ──► S4
+                                         ▲
+                             (USB-OTG solder bridge closed)
+```
+
+A USB-C to USB-A adapter plus the S4's original cable works just as well; the Mini-USB adapter just saves a link.
 
 ## Flashing
 
@@ -80,5 +98,7 @@ Via NTP as soon as internet is available. Otherwise the ESP takes the time from 
 | Hotspot does not appear | Wait 30 s, unplug and replug the ESP. Further: [Flashing, troubleshooting](flashing.md#if-something-goes-wrong) |
 | Setup page does not open | Enter `http://192.168.4.1/setup` by hand, turn mobile data off |
 | Page does not load on the home Wi-Fi | Use the IP instead of `waterrower.local` |
-| "Ergometer connected" does not appear | Check cable and OTG adapter and switch the S4 monitor on |
 | Forgot the device password | Reflash with *Erase Flash* ([Flashing](flashing.md)); settings and workouts are lost |
+| Sensors stay at 0, no "Ergometer connected" | The ESP sees no device. Check the solder bridge (multimeter: about 5 V on the VBUS pin of the **USB** socket), check adapter and cable for data lines |
+| The S4 never switches itself off | Normal and not fixable in firmware: as soon as it sees 5 V on VBUS and is enumerated it behaves as if attached to a PC and runs from USB power. Its 2-minute auto power-off only applies on battery. To have it off between workouts, cut the ESP's power, e.g. with a smart plug |
+| Workouts have the wrong time (shifted by hours) | Check the time zone in the ESP ([Settings](#settings)) |

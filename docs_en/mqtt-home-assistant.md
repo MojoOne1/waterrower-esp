@@ -18,7 +18,40 @@ Last will: `<prefix>/status` reports `offline` when the ESP disappears; all enti
 
 `last_session` is published on `<prefix>/session/last`, live values on `<prefix>/live` and the single topics (`waterrower/distance` etc.).
 
-The topics match the earlier ESPHome variant. There is no ready-made dashboard; build one from the entities.
+## Topics
+
+All under the prefix (default `waterrower/`):
+
+| Topic | Content |
+|---|---|
+| `distance` | distance in m |
+| `speed` | speed in m/s |
+| `stroke_rate` | stroke rate |
+| `strokes` | stroke count |
+| `ratio` | pull/recovery ratio |
+| `duration` | duration in s |
+| `duration_formatted` | duration as `hh:mm:ss` |
+| `watts` | watts |
+| `total_distance` | lifetime distance in m |
+| `split_500m` | 500 m split as `m:ss` |
+| `session_active` | `ON` / `OFF` |
+| `session_id` | ID of the running workout |
+| `live` | all values as JSON, 1×/s during a workout |
+| `session/last` | summary of the last workout (retained) |
+| `s4_connected` | `ON` / `OFF`: the S4 is on and enumerated on USB (retained) |
+| `usb_mode` | `ON` / `OFF`: the S4 is in USB mode and streaming (retained) |
+| `firmware_version` | firmware version (retained) |
+| `cmd/end_session` | **to** the ESP: end the running workout; payload `reset` also resets the monitor |
+| `cmd/session_timeout` | **to** the ESP: session timeout in minutes (1–60) |
+| `status` | `online` / `offline` (last will) |
+
+The topics match the earlier ESPHome variant. One exception: `split_500m_s` (500 m split in seconds) no longer exists.
+
+## Home Assistant dashboard
+
+[`homeassistant/dashboard.yaml`](../homeassistant/dashboard.yaml) is a ready-made dashboard: live tiles, workout summary, a 24 h history graph and device controls (session timeout, end-and-reset button, versions).
+
+Import: *Settings → Dashboards → Add dashboard → New dashboard from scratch*, open it, three-dot menu → *Edit* → menu → *Raw configuration editor*, paste the file. The entity IDs assume the device is called "WaterRower" in Home Assistant (`sensor.waterrower_…`). If Home Assistant gave it another prefix, replace `waterrower_` in the file first.
 
 ## Status
 
