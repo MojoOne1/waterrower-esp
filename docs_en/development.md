@@ -24,31 +24,6 @@ sh firmware/test/host/run.sh    # storage, input validation, MQTT discovery; no 
 
 Also runs in GitHub Actions (`.github/workflows/firmware.yml`), followed by the build.
 
-## History
-
-The earlier variant (ESPHome firmware plus a Docker tracker, MQTT/Home Assistant as the only way in) is no longer in the current tree, but nothing is lost: it stays in this repository. The branch `legacy` holds the last state of the old repository, and the full history is part of `main`.
-
-```bash
-git checkout legacy     # then see esphome/waterrower.yaml, docker/, docs/
-```
-
-Old releases (check out the commit, e.g. `git checkout <commit>`):
-
-| Release | Commit |
-|---|---|
-| v1.0.0 | `cba4121` |
-| v1.1.0 | `5ddcb9f` |
-| v1.2.0 | `4a3f2d3` |
-| v1.2.1 | `565b1a9` |
-| v1.3.0 | `b3a8def` |
-| v1.4.0 | `e148ae1` |
-| v1.5.0 | `d29b220` |
-| v1.6.0 | `6c31b3c` |
-| v1.6.1 | `a07cffe` |
-| v2.0.0 | `0b97434` |
-
-The old arena development branch ends at commit `768664a`. The arena server's history before it moved lives in the history of [waterrower-arena](https://github.com/MojoOne1/waterrower-arena).
-
 ## Code layout
 
 The S4's protocol and the registers used: [S4 protocol](s4-protocol.md).
