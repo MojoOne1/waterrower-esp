@@ -2,7 +2,7 @@
 
 [🇩🇪 Deutsch](../docs_de/bedienung.md) · 🇬🇧 English
 
-Open the page in a browser at `http://waterrower.local` (phone or PC on the same Wi-Fi, see [Setup](einrichtung.md#open-the-page)). The screenshots show the German UI; the DE/EN toggle at the top switches it.
+Open the page in a browser at `http://waterrower.local` (phone or PC on the same Wi-Fi, see [Setup](setup.md#open-the-page)). The screenshots show the German UI; the DE/EN toggle at the top switches it.
 
 ## Live
 

@@ -7,7 +7,7 @@ From a bare board to your first workout. No prior knowledge needed.
 ## Overview
 
 1. [Get and connect the hardware](#hardware)
-2. [Flash the firmware](flashen.md) (once, on a computer)
+2. [Flash the firmware](flashing.md) (once, on a computer)
 3. [Set up Wi-Fi](#wi-fi-setup) (on your phone)
 4. [Open the page and row](#open-the-page)
 
@@ -24,9 +24,9 @@ The board's two sockets: **COM** (for flashing and power) and **USB** (to the S4
 
 ## Flashing
 
-In detail with step-by-step instructions and troubleshooting: **[Flashing with the browser flasher](flashen.md)**. In short: write [`firmware/release/waterrower-esp-3.0.0-merged.bin`](../firmware/release/) to address **`0x0`**.
+In detail with step-by-step instructions and troubleshooting: **[Flashing with the browser flasher](flashing.md)**. In short: write [`firmware/release/waterrower-esp-3.0.0-merged.bin`](../firmware/release/) to address **`0x0`**.
 
-To build it yourself: [Development](entwicklung.md).
+To build it yourself: [Development](development.md).
 
 ## Wi-Fi setup
 
@@ -47,7 +47,7 @@ If nothing opens (some Android devices do not know `.local`): find **"waterrower
 
 It works without Wi-Fi too: join the hotspot and open `http://192.168.4.1`.
 
-The chip at the top shows **"Ergometer connected"** as soon as the S4 is attached to the ESP. The first stroke starts a workout. Everything else: [Usage](bedienung.md).
+The chip at the top shows **"Ergometer connected"** as soon as the S4 is attached to the ESP. The first stroke starts a workout. Everything else: [Usage](usage.md).
 
 ## Settings
 
@@ -60,8 +60,8 @@ Card **WiFi & settings** (further down the page):
 | WiFi name / password | Home network; an empty password field keeps the stored one. *Scan networks* lists networks in range. |
 | Time zone | POSIX string, default `CET-1CEST,M3.5.0,M10.5.0/3` (Central Europe with daylight saving) |
 | Session timeout | Minutes without a stroke until a workout ends automatically (1–60, default 5) |
-| Hotspot password | replaces `waterrower` (at least 8 characters), see [Security](sicherheit.md) |
-| Device password | protects changes, see [Security](sicherheit.md) |
+| Hotspot password | replaces `waterrower` (at least 8 characters), see [Security](security.md) |
+| Device password | protects changes, see [Security](security.md) |
 
 Below: cards for [Arena](arena.md), [MQTT / Home Assistant](mqtt-home-assistant.md) and *Firmware update*. The screenshots show the German UI; the DE/EN toggle at the top switches it.
 
@@ -77,8 +77,8 @@ Via NTP as soon as internet is available. Otherwise the ESP takes the time from 
 
 | Problem | Fix |
 |---|---|
-| Hotspot does not appear | Wait 30 s, unplug and replug the ESP. Further: [Flashing, troubleshooting](flashen.md#if-something-goes-wrong) |
+| Hotspot does not appear | Wait 30 s, unplug and replug the ESP. Further: [Flashing, troubleshooting](flashing.md#if-something-goes-wrong) |
 | Setup page does not open | Enter `http://192.168.4.1/setup` by hand, turn mobile data off |
 | Page does not load on the home Wi-Fi | Use the IP instead of `waterrower.local` |
 | "Ergometer connected" does not appear | Check cable and OTG adapter and switch the S4 monitor on |
-| Forgot the device password | Reflash with *Erase Flash* ([Flashing](flashen.md)); settings and workouts are lost |
+| Forgot the device password | Reflash with *Erase Flash* ([Flashing](flashing.md)); settings and workouts are lost |

@@ -1,6 +1,6 @@
 # Flashen mit dem Browser-Flasher
 
-🇩🇪 Deutsch · [🇬🇧 English](../docs_en/flashen.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/flashing.md)
 
 **Flashen** heißt: die Firmware (das Programm) in den Speicher des ESP32 schreiben. Das ist nur beim ersten Mal nötig, spätere Updates gehen über die Weboberfläche. Du brauchst dafür nichts zu installieren: Ein **Browser-Flasher** ist eine Webseite, die über den USB-Anschluss direkt mit dem ESP spricht.
 

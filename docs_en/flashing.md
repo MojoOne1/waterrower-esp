@@ -31,7 +31,7 @@ We use Espressif's flasher (Espressif makes the chip): <https://espressif.github
 5. Enter `0x0` as **Flash Address** and choose the `merged.bin` with **Choose File**.
 6. Click **Program**. A bar runs to 100 %. Do not unplug until the page says it is done (about 1–2 minutes).
 7. Click **Disconnect**, then press the **RESET** (or EN) button on the board, or unplug and replug the cable.
-8. After about 20–30 seconds the Wi-Fi **`WaterRower-XXXX`** appears. That means success. Continue with [Setup](einrichtung.md#wi-fi-setup).
+8. After about 20–30 seconds the Wi-Fi **`WaterRower-XXXX`** appears. That means success. Continue with [Setup](setup.md#wi-fi-setup).
 
 The first start takes a little longer because the ESP creates its storage for workouts.
 

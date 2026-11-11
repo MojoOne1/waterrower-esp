@@ -27,26 +27,26 @@ WaterRower S4 ──USB──► ESP32-S3 ──Wi-Fi──► browser (phone/PC
 
 ## Quick start
 
-1. Flash the prebuilt image from [`firmware/release/`](firmware/release/) to address `0x0` with a browser flasher, step by step in [Flashing](docs_en/flashen.md) (Chrome or Edge, nothing to install).
+1. Flash the prebuilt image from [`firmware/release/`](firmware/release/) to address `0x0` with a browser flasher, step by step in [Flashing](docs_en/flashing.md) (Chrome or Edge, nothing to install).
 2. Connect to the hotspot `WaterRower-XXXX` (password `waterrower`) and pick your Wi-Fi.
 3. Open `http://waterrower.local`.
 
-Beginner-friendly walkthrough, including cabling: [Setup](docs_en/einrichtung.md).
+Beginner-friendly walkthrough, including cabling: [Setup](docs_en/setup.md).
 
 ## Documentation
 
-Available in English (`docs_en/`) and German (`docs_de/`, same file names).
+Everything is available in English (`docs_en/`) and German (`docs_de/`).
 
-| Topic | File |
-|---|---|
-| **Start here:** hardware, Wi-Fi, first workout | [docs_en/einrichtung.md](docs_en/einrichtung.md) |
-| **Flashing with the browser flasher** | [docs_en/flashen.md](docs_en/flashen.md) |
-| Using the web UI | [docs_en/bedienung.md](docs_en/bedienung.md) |
-| MQTT and Home Assistant | [docs_en/mqtt-home-assistant.md](docs_en/mqtt-home-assistant.md) |
-| Arena (multiplayer) | [docs_en/arena.md](docs_en/arena.md) |
-| Security | [docs_en/sicherheit.md](docs_en/sicherheit.md) |
-| Building, tests, code layout | [docs_en/entwicklung.md](docs_en/entwicklung.md) |
-| Printable case | [case/](case/) |
+| Topic | English | Deutsch |
+|---|---|---|
+| **Start here:** hardware, Wi-Fi, first workout | [setup.md](docs_en/setup.md) | [einrichtung.md](docs_de/einrichtung.md) |
+| **Flashing with the browser flasher** | [flashing.md](docs_en/flashing.md) | [flashen.md](docs_de/flashen.md) |
+| Using the web UI | [usage.md](docs_en/usage.md) | [bedienung.md](docs_de/bedienung.md) |
+| MQTT and Home Assistant | [mqtt-home-assistant.md](docs_en/mqtt-home-assistant.md) | [mqtt-home-assistant.md](docs_de/mqtt-home-assistant.md) |
+| Arena (multiplayer) | [arena.md](docs_en/arena.md) | [arena.md](docs_de/arena.md) |
+| Security | [security.md](docs_en/security.md) | [sicherheit.md](docs_de/sicherheit.md) |
+| Building, tests, code layout | [development.md](docs_en/development.md) | [entwicklung.md](docs_de/entwicklung.md) |
+| Printable case | [case/](case/) | [case/](case/) |
 
 ## Status and limits
 

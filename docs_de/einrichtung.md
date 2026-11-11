@@ -1,6 +1,6 @@
 # Einrichtung
 
-🇩🇪 Deutsch · [🇬🇧 English](../docs_en/einrichtung.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/setup.md)
 
 Von der leeren Platine bis zur ersten Einheit. Vorkenntnisse sind nicht nötig.
 

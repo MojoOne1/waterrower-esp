@@ -1,6 +1,6 @@
 # Bedienung
 
-🇩🇪 Deutsch · [🇬🇧 English](../docs_en/bedienung.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/usage.md)
 
 Die Seite öffnest du im Browser unter `http://waterrower.local` (Handy oder PC im selben WLAN, siehe [Einrichtung](einrichtung.md#seite-öffnen)).
 

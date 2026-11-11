@@ -1,6 +1,6 @@
 # Sicherheit
 
-🇩🇪 Deutsch · [🇬🇧 English](../docs_en/sicherheit.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/security.md)
 
 Der ESP hängt ohne TLS im Heimnetz. Was die Firmware dagegen tut, und was nicht.
 
