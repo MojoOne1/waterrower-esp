@@ -7,7 +7,7 @@ Der ESP kann Einheiten live an einen Arena-Server schicken, um gemeinsam zu rude
 ## Verbinden
 
 1. Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tracker-Verbindung* einen Token.
-2. Im ESP in den Einstellungen die Karte *Arena* öffnen: **Server** (z. B. `https://arena.example.com`) und **Token** eintragen, aktivieren.
+2. Im ESP in den Einstellungen die Karte *Arena – gemeinsam rudern* öffnen: **Server** (z. B. `https://arena.example.com`) und **Token** eintragen, *Daten an die Arena senden* anhaken, speichern.
 3. Der Chip oben zeigt „Arena: <Name>“, sobald die Verbindung steht.
 
 Der ESP baut die Verbindung selbst aus (`wss://`), es braucht keine Portfreigabe zum ESP. Verpasste Einheiten werden nachgesendet, Rennstatus wird live angezeigt. Das Token wird nie ausgegeben und nur an die eingetragene Adresse gesendet.

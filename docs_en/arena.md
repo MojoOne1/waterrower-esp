@@ -7,7 +7,7 @@ The ESP can send workouts live to an arena server to row together. The server ha
 ## Connecting
 
 1. The operator creates an athlete and generates a token under *Account → Tracker connection*.
-2. In the ESP settings open the *Arena* card: enter **server** (e.g. `https://arena.example.com`) and **token**, and enable it.
+2. In the ESP settings open the *Arena – rowing together* card: enter **server** (e.g. `https://arena.example.com`) and **token**, tick *Send data to the arena* and save.
 3. The chip at the top shows "Arena: <name>" once the connection is up.
 
 The ESP opens the connection itself (`wss://`); no port forwarding to the ESP is needed. Missed workouts are re-sent later, race status is shown live. The token is never displayed and is only sent to the address it was entered for.

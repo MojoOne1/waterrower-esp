@@ -2,7 +2,7 @@
 
 🇩🇪 Deutsch · [🇬🇧 English](../docs_en/mqtt-home-assistant.md)
 
-Optional und standardmäßig **aus**. In der Weboberfläche gibt es eine Karte *MQTT* mit Schalter, Broker-Adresse, Zugangsdaten und Topic-Präfix (Standard `waterrower`). Aktiviert veröffentlicht der ESP Discovery-Nachrichten unter `homeassistant/…`; das Gerät „WaterRower“ erscheint in Home Assistant von selbst.
+Optional und standardmäßig **aus**. In der Weboberfläche gibt es die Karte *MQTT / Home Assistant* mit den Schaltern *MQTT aktiv* und *Home-Assistant-Discovery senden*, Broker-Adresse, Zugangsdaten und Topic-Präfix (Standard `waterrower`). Aktiviert veröffentlicht der ESP Discovery-Nachrichten unter `homeassistant/…`; das Gerät „WaterRower“ erscheint in Home Assistant von selbst.
 
 Last Will: `<präfix>/status` meldet `offline`, wenn der ESP wegfällt; alle Entitäten werden dann „nicht verfügbar“. `mqtts://` prüft gegen öffentliche Zertifizierungsstellen, selbstsignierte Zertifikate werden nicht akzeptiert.
 

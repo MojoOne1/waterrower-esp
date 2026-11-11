@@ -2,28 +2,37 @@
 
 [🇩🇪 Deutsch](../docs_de/bedienung.md) · 🇬🇧 English
 
+Open the page in a browser at `http://waterrower.local` (phone or PC on the same Wi-Fi, see [Setup](einrichtung.md#open-the-page)). The screenshots show the German UI; the DE/EN toggle at the top switches it.
+
 ## Live
 
 ![Live view](../screenshots/live.png)
 
-While rowing, the page shows distance, pace, split per 500 m, stroke rate, watts and duration, plus a history chart. Values arrive via server-sent events from the ESP, once per second. A workout starts with the first stroke and ends after the configured timeout or via *End session*. *Reset* discards the running workout.
+Four tiles like on the monitor: **stroke rate** (strokes/min), **speed** (m/s), **duration** and **distance** (m). Below them the running workout with the time for 500 m. Until the first stroke it says "Waiting for a stroke".
 
-The chips at the top show whether the S4 is connected, whether recording is running and whether the arena is connected.
+The chips at the top: **Ergometer connected** (S4 detected on the ESP), **recording** and **Arena: name** (if the [arena](arena.md) is connected). Values arrive once per second directly from the ESP.
 
-## History and comparison
+A workout starts with the first stroke and ends after the configured timeout (default 5 minutes without a stroke) or with a button:
 
-![History](../screenshots/history.png)
+- **End session:** finishes the workout; the monitor keeps its display.
+- **End & zero:** finishes it and sets the monitor back to zero.
 
-Each workout appears with date, distance, duration, average pace and a sparkline. Click one to open it with charts. *Compare* overlays several workouts.
+## Sessions and history
 
-## Export
+![Sessions](../screenshots/history.png)
 
-- **CSV** per workout
-- **Excel** per workout or for all, generated in the browser (no chart)
+On the left the list of all workouts: date, distance, duration, time per 500 m, stroke rate and a small speed sparkline. Clicking one opens it on the right with key figures (distance, duration, avg 500 m, avg speed, peak, avg stroke rate, strokes, metres per stroke) and two charts: speed and stroke rate over time.
+
+**Compare:** tick *compare* on up to four workouts and a chart at the bottom overlays their speed from the start. *All sessions* shows distance per workout over time.
+
+## Export and delete
+
+- **CSV** and **Excel** per workout (links above the workout), **All as Excel** for all workouts. Excel is generated in the browser and contains tables, no chart.
+- **delete** removes a workout permanently (with confirmation).
 
 ## Phone and dark mode
 
-Toggles at the top for language (DE/EN) and theme (auto, light, dark).
+At the top left you switch language (DE/EN) and appearance (auto, light, dark). The page is made for phones.
 
 <p>
 <img src="../screenshots/live-dark.png" width="48%" alt="Dark mode">
@@ -33,6 +42,6 @@ Toggles at the top for language (DE/EN) and theme (auto, light, dark).
 
 ## Storage
 
-Workouts live in internal flash (~10 MB). When space gets tight the oldest are deleted. After a power loss the running workout is restored on the next start.
+Workouts live in the ESP's internal flash (about 10 MB). When space gets tight the oldest are deleted. After a power loss the running workout is restored on the next start. To keep workouts permanently, export them as CSV or Excel.
 
 > All screenshots show generated sample data.

@@ -2,7 +2,7 @@
 
 [🇩🇪 Deutsch](../docs_de/mqtt-home-assistant.md) · 🇬🇧 English
 
-Optional and **off** by default. The web UI has an *MQTT* card with a switch, broker address, credentials and topic prefix (default `waterrower`). When enabled, the ESP publishes discovery messages under `homeassistant/…`; the device "WaterRower" shows up in Home Assistant on its own.
+Optional and **off** by default. The web UI has an *MQTT / Home Assistant* card with the switches *MQTT enabled* and *Send Home Assistant discovery*, broker address, credentials and topic prefix (default `waterrower`). When enabled, the ESP publishes discovery messages under `homeassistant/…`; the device "WaterRower" shows up in Home Assistant on its own.
 
 Last will: `<prefix>/status` reports `offline` when the ESP disappears; all entities then become unavailable. `mqtts://` verifies against public certificate authorities; self-signed certificates are not accepted.
 
