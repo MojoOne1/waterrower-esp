@@ -21,7 +21,7 @@ WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)
 
 - **Optional: MQTT mit Home-Assistant-Discovery** (Karte „MQTT“, standardmäßig aus, per Schalter an/aus). Gleiche Topics und Entitätsnamen wie die alte ESPHome-Firmware (`waterrower/distance`, `waterrower/live`, `waterrower/session/last`, Befehle auf `waterrower/cmd/end_session`). Das Gerät „WaterRower“ mit 23 Entitäten (Sensoren, Buttons *Reset*/*End Session*, Zahl *Session Timeout*) taucht in HA von selbst auf; Last Will markiert sie bei Ausfall als „nicht verfügbar“.
 
-Bewusst **nicht** mehr dabei: ESPHome und dessen native Home-Assistant-API.
+Bewusst **nicht** mehr dabei: ESPHome und dessen native Home-Assistant-API. Die alte Variante (ESPHome-Firmware und Tracker-Container) liegt weiter im Repository [MojoOne1/waterrower-mqtt](https://github.com/MojoOne1/waterrower-mqtt).
 
 ## Bauen und flashen
 
@@ -71,7 +71,7 @@ Bewusst offen bzw. nicht abgedeckt:
 sh firmware/test/host/run.sh          # Speicher, Eingabeprüfung, MQTT-Discovery (ohne Hardware)
 ```
 
-Die Tests des Arena-Servers liegen im Arena-Repository (`python tests/run_all.py`). Die Tests der alten Tracker-Variante unter `legacy/` wurden mit dem Umzug der Arena entfernt; sie stehen in der Git-Historie (Commit `1d2cb70`).
+Die Tests des Arena-Servers liegen im Arena-Repository (`python tests/run_all.py`).
 
 ## Arena (Mehrspieler)
 
@@ -91,7 +91,6 @@ Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tra
 | `firmware/web/` | Oberfläche (wird beim Build gzip-komprimiert in die Firmware eingebettet) |
 | `firmware/test/host/` | Tests, die ohne Hardware auf dem PC laufen |
 | `firmware/release/` | Fertiges Komplett-Image zum ersten Flashen (Adresse `0x0`) |
-| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container (unverändert, nicht Teil des Reviews, ohne Tests und ohne Arena) |
 
 ## Stand und Grenzen
 

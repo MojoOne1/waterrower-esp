@@ -4,7 +4,4 @@ firmware/.pio/
 firmware/managed_components/
 firmware/sdkconfig.esp32s3
 firmware/dependencies.lock
-legacy/esphome/secrets.yaml
-legacy/esphome/.esphome/
-legacy/docker/data/
 firmware/src/web_assets.c
