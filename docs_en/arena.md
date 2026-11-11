@@ -12,4 +12,4 @@ The ESP can send workouts live to an arena server to row together. The server ha
 
 The ESP opens the connection itself (`wss://`); no port forwarding to the ESP is needed. Missed workouts are re-sent later, race status is shown live. The token is never displayed and is only sent to the address it was entered for.
 
-Protocol: [protokoll.md](https://github.com/MojoOne1/waterrower-arena/blob/main/docs_en/protocol.md); firmware side: `firmware/src/uplink.c`.
+Protocol: [protocol.md](https://github.com/MojoOne1/waterrower-arena/blob/main/docs_en/protocol.md); firmware side: `firmware/src/uplink.c`.
