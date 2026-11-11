@@ -1,5 +1,7 @@
 # Bedienung
 
+🇩🇪 Deutsch · [🇬🇧 English](en/bedienung.md)
+
 ## Live
 
 ![Live-Ansicht](screenshots/live.png)

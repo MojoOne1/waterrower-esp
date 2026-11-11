@@ -1,5 +1,7 @@
 # Entwicklung
 
+🇩🇪 Deutsch · [🇬🇧 English](en/entwicklung.md)
+
 ## Bauen
 
 ```bash

@@ -1,5 +1,7 @@
 # WaterRower ESP
 
+🇩🇪 Deutsch · [🇬🇧 English](README.en.md)
+
 Firmware für einen **ESP32-S3**, der zwischen WaterRower S4 und WLAN sitzt: Er liest die Rudermaschine per USB, zeichnet jede Einheit im eigenen Flash auf und liefert die Weboberfläche gleich mit. Kein Server, kein Container, kein Cloud-Konto.
 
 ![Live-Ansicht](docs/screenshots/live.png)
@@ -49,7 +51,3 @@ Details in der [Einrichtung](docs/einrichtung.md).
 - MQTT-Discovery ist auf gültiges JSON geprüft, aber nicht gegen einen echten Broker oder Home Assistant.
 - Excel-Export enthält Tabellen, aber kein Diagramm.
 - Maximal 4 gleichzeitige Live-Ansichten.
-
-## Herkunft
-
-Hervorgegangen aus [MojoOne1/waterrower-mqtt](https://github.com/MojoOne1/waterrower-mqtt) (ESPHome-Firmware plus Tracker-Container), das dort weiter liegt. Der Arena-Server hat ein eigenes Repository: [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena).

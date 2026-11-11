@@ -1,5 +1,7 @@
 # Einrichtung
 
+🇩🇪 Deutsch · [🇬🇧 English](en/einrichtung.md)
+
 ## Hardware
 
 - ESP32-S3-DevKitC-1 (N16R8: 16 MB Flash, 8 MB PSRAM)
