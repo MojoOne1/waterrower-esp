@@ -22,7 +22,7 @@ Von der leeren Platine bis zur ersten Einheit. Vorkenntnisse sind nicht nötig.
 | USB-Netzteil (5 V) | am **COM**-Port, für den Dauerbetrieb |
 | USB-C-**Datenkabel** | zum Flashen am Computer (ein reines Ladekabel genügt nicht) |
 
-Optional ein [Gehäuse zum Drucken](../case/) für die Rückseite der S4.
+Optional ein [Gehäuse zum Drucken](../case/) für die Rückseite der S4, auf Wunsch mit QR-Code zu diesem Repository im Deckel (`esp32case_lid_qr.stl`).
 
 ### Die USB-OTG-Lötbrücke
 

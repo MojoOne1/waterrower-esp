@@ -22,7 +22,7 @@ From a bare board to your first workout. No prior knowledge needed.
 | USB power supply (5 V) | on the **COM** port, for permanent use |
 | USB-C **data cable** | for flashing from a computer (a charge-only cable is not enough) |
 
-Optionally a [printable case](../case/) for the back of the S4.
+Optionally a [printable case](../case/) for the back of the S4, if you like with a QR code to this repository in the lid (`esp32case_lid_qr.stl`).
 
 ### The USB-OTG solder bridge
 

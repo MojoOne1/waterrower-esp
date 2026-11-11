@@ -15,6 +15,7 @@ unlike the rest of this repository, which is MIT. See [LICENSE](LICENSE).
 | `esp32case_bottom.stl` | Bottom with a flat underside, for Velcro or Dual Lock – ~28 g PLA, 114 × 35 × 16 mm |
 | `esp32case_bottom_ears.stl` | The same bottom with zip-tie ears on both long sides – ~30 g PLA, 114 × 57 × 16 mm |
 | `esp32case_lid.stl` | Lid, fits either bottom – ~7 g PLA |
+| `esp32case_lid_qr.stl` | The same lid with a QR code to this repository engraved next to the vents |
 
 ## Where to mount it
 
@@ -54,6 +55,21 @@ for strapping it to a strut or tube.
 - **WR** engraved over the port that goes to the WaterRower monitor and a
   lightning bolt over the power port, 0.6 mm deep.
 
+**QR lid** (`esp32case_lid_qr.stl`)
+- A QR code to the repository, 22 × 22 mm (25 × 25 modules of 0.88 mm),
+  engraved 0.6 mm deep like the WR mark.
+- To make room, the two vent slots next to it are closed; four of six remain,
+  plenty for the ESP's half a watt. The thin spot over the small pocket on
+  the inside is left alone, so at least 1.4 mm of material stays under the
+  code.
+- The code reads `HTTPS://GITHUB.COM/MOJOONE1/WATERROWER-ESP`: upper case
+  fits QR's compact alphanumeric mode and keeps the modules large enough to
+  print; GitHub ignores the case.
+- Rebuilt with `python case/tools/lid_qr.py` (needs `trimesh`,
+  `manifold3d`, `qrcode`).
+
+![Lid and QR lid, top view](preview_qr.png)
+
 ## Printing
 
 - **Bottom:** floor on the bed, like the original. The plinth (and the
@@ -61,6 +77,13 @@ for strapping it to a strut or tube.
   supports.
 - **Lid:** top face down on the bed, like the original (its lip points
   up). The engraving then forms in the first layers and comes out crisp.
+- **QR lid, for a code that scans:** a dark code on a light lid. Start in a
+  light filament and change to a dark one at **0.6 mm** (after the third
+  0.2 mm layer; in PrusaSlicer/OrcaSlicer/Cura a colour change at that
+  height). The engraved modules then show the dark filament, everything
+  around them stays light. In a single colour the code relies on shadow
+  and scans only in flat side light. First layer 0.2 mm with elephant-foot
+  compensation on: a squashed first layer closes the gaps between modules.
 
 ## Zip ties
 
