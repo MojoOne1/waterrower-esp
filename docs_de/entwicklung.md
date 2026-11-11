@@ -26,13 +26,28 @@ Läuft auch in GitHub Actions (`.github/workflows/firmware.yml`), danach wird ge
 
 ## Historie
 
-Die frühere Variante (ESPHome-Firmware plus Docker-Tracker, MQTT/Home Assistant als einziger Weg) ist nicht mehr im aktuellen Stand, aber nichts ist verloren: Sie bleibt in der Git-Historie dieses Repositorys. Die Tags `legacy/v1.0.0` … `legacy/v2.0.0` sind die alten Releases, `legacy/master-final` der letzte Stand des alten Repositorys und `legacy/arena-branch` der alte Entwicklungszweig der Arena.
+Die frühere Variante (ESPHome-Firmware plus Docker-Tracker, MQTT/Home Assistant als einziger Weg) ist nicht mehr im aktuellen Stand, aber nichts ist verloren: Sie bleibt in diesem Repository. Der Branch `legacy` enthält den letzten Stand des alten Repositorys, die komplette Historie ist Teil von `main`.
 
 ```bash
-git checkout legacy/master-final     # dann esphome/waterrower.yaml, docker/, docs/ ansehen
+git checkout legacy     # dann esphome/waterrower.yaml, docker/, docs/ ansehen
 ```
 
-Die Historie des Arena-Servers vor dem Umzug liegt in der Historie von [waterrower-arena](https://github.com/MojoOne1/waterrower-arena).
+Alte Releases (Commit auschecken, z. B. `git checkout <commit>`):
+
+| Release | Commit |
+|---|---|
+| v1.0.0 | `cba4121` |
+| v1.1.0 | `5ddcb9f` |
+| v1.2.0 | `4a3f2d3` |
+| v1.2.1 | `565b1a9` |
+| v1.3.0 | `b3a8def` |
+| v1.4.0 | `e148ae1` |
+| v1.5.0 | `d29b220` |
+| v1.6.0 | `6c31b3c` |
+| v1.6.1 | `a07cffe` |
+| v2.0.0 | `0b97434` |
+
+Der alte Entwicklungszweig der Arena endet bei Commit `768664a`. Die Historie des Arena-Servers vor dem Umzug liegt in der Historie von [waterrower-arena](https://github.com/MojoOne1/waterrower-arena).
 
 ## Aufbau
 
