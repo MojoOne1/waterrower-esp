@@ -1,12 +1,11 @@
-esphome/secrets.yaml
-esphome/.esphome/
-# What the optional ESPHome dashboard container works in: installed
-# configs, secrets and a build cache that runs to hundreds of MB.
-esphome-data/
-docker/data/
-docker/mosquitto/data/
-docker/mosquitto/config/passwd
-server/data/
 .env
 __pycache__/
-waterrower-esphome.zip
+server/data/
+firmware/.pio/
+firmware/managed_components/
+firmware/sdkconfig.esp32s3
+firmware/dependencies.lock
+legacy/esphome/secrets.yaml
+legacy/esphome/.esphome/
+legacy/docker/data/
+firmware/src/web_assets.c

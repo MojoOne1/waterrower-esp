@@ -1,0 +1,6 @@
+dependencies:
+  espressif/usb_host_cdc_acm: "^2.0.0"
+  espressif/esp_websocket_client: "*"
+  espressif/mdns: "*"
+  joltwallet/littlefs: "*"
+  espressif/cjson: "*"

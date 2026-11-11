@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WaterRower setup</title>
+<style>
+  :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+  body { max-width: 28rem; margin: 0 auto; padding: 1.2rem; }
+  h1 { font-size: 1.3rem; }
+  label { display: block; margin: .8rem 0 .2rem; font-size: .9rem; }
+  input, select, button { width: 100%; box-sizing: border-box; padding: .6rem; font-size: 1rem; }
+  button { margin-top: 1rem; cursor: pointer; }
+  ul { list-style: none; padding: 0; margin: .5rem 0; }
+  li { padding: .5rem; border-bottom: 1px solid #8884; cursor: pointer; display: flex; justify-content: space-between; }
+  #msg { margin-top: 1rem; min-height: 1.5rem; }
+  .ok { color: #2a8a3a; } .err { color: #c33; }
+  a { display: inline-block; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<h1 id="h">WaterRower – WiFi setup</h1>
+<button id="scan" type="button">Scan networks</button>
+<ul id="nets"></ul>
+<form id="f">
+  <label id="l1" for="ssid">WiFi name</label>
+  <input id="ssid" name="ssid" autocomplete="off" required>
+  <label id="l2" for="pw">Password</label>
+  <input id="pw" name="password" type="password" autocomplete="new-password">
+  <button id="save" type="submit">Connect</button>
+</form>
+<div id="msg"></div>
+<a id="home" href="/">Open the rower page</a>
+<script>
+const de = (navigator.language || "").startsWith("de");
+const T = de ? { h: "WaterRower – WLAN einrichten", scan: "Netze suchen", l1: "WLAN-Name", l2: "Passwort", save: "Verbinden",
+  home: "Zur Ruderseite", busy: "Verbinde …", ok: "Verbunden – neue Adresse: ", fail: "Noch keine Verbindung. Name und Passwort prüfen.", scanning: "Suche …" }
+  : { h: "WaterRower – WiFi setup", scan: "Scan networks", l1: "WiFi name", l2: "Password", save: "Connect",
+  home: "Open the rower page", busy: "Connecting …", ok: "Connected – new address: ", fail: "Not connected yet. Check name and password.", scanning: "Scanning …" };
+document.documentElement.lang = de ? "de" : "en";
+h.textContent = T.h; scan.textContent = T.scan; l1.textContent = T.l1; l2.textContent = T.l2; save.textContent = T.save; home.textContent = T.home;
+const say = (s, c) => { msg.textContent = s; msg.className = c || ""; };
+
+scan.onclick = async () => {
+  say(T.scanning);
+  try {
+    const list = await (await fetch("/api/wifi/scan")).json();
+    nets.textContent = "";
+    list.sort((a, b) => b.rssi - a.rssi).forEach((n) => {
+      const li = document.createElement("li");
+      li.textContent = n.ssid; const s = document.createElement("span"); s.textContent = (n.secure ? "🔒 " : "") + n.rssi + " dBm";
+      li.appendChild(s); li.onclick = () => { ssid.value = n.ssid; pw.focus(); };
+      nets.appendChild(li);
+    });
+    say("");
+  } catch { say(T.fail, "err"); }
+};
+
+f.onsubmit = async (e) => {
+  e.preventDefault();
+  say(T.busy);
+  await fetch("/api/wifi", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ssid: ssid.value, password: pw.value }) });
+  for (let i = 0; i < 20; i++) {
+    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const s = await (await fetch("/api/wifi")).json();
+      if (s.connected) { say(T.ok + s.ip + "  (waterrower.local)", "ok"); return; }
+    } catch { /* link may drop while the station reconnects */ }
+  }
+  say(T.fail, "err");
+};
+scan.click();
+</script>
+</body>
+</html>
