@@ -1,53 +1,57 @@
 # WaterRower ESP
 
-🇩🇪 Deutsch · [🇬🇧 English](README.en.md)
+🇬🇧 English · 🇩🇪 Die Dokumentation gibt es auch auf Deutsch: [docs_de/](docs_de/)
 
-Firmware für einen **ESP32-S3**, der zwischen WaterRower S4 und WLAN sitzt: Er liest die Rudermaschine per USB, zeichnet jede Einheit im eigenen Flash auf und liefert die Weboberfläche gleich mit. Kein Server, kein Container, kein Cloud-Konto.
+Firmware for an **ESP32-S3** that sits between the WaterRower S4 and your Wi-Fi: it reads the rowing machine over USB, records every workout to its own flash and serves the web UI itself. No server, no container, no cloud account.
 
-![Live-Ansicht](screenshots/live.png)
+![Live view](screenshots/live.png)
 
 ```
-WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)  http://waterrower.local
-                        │  Aufzeichnung (Flash), Diagramme, CSV/Excel
+WaterRower S4 ──USB──► ESP32-S3 ──Wi-Fi──► browser (phone/PC)  http://waterrower.local
+                        │  recording (flash), charts, CSV/Excel
                         ├── MQTT / Home Assistant (optional)
-                        └── Arena-Uplink (optional)
+                        └── arena uplink (optional)
 ```
 
-> Die Screenshots stammen aus einem Mock-Server mit **erzeugten Beispieldaten**, nicht von einer echten Rudereinheit.
+> The screenshots come from a mock server with **generated sample data**, not from a real workout. The UI is shown in German; it can be switched to English with the DE/EN toggle.
 
-## Funktionen
+## Features
 
-- **Live-Anzeige** mit Distanz, Tempo, Split/500 m, Schlagfrequenz, Watt und Verlaufsdiagramm
-- **Aufzeichnung im internen Flash** (~10 MB, älteste Einheiten werden bei Platzmangel gelöscht), Wiederherstellung nach Stromausfall
-- **Verlauf und Vergleich** von Einheiten, Export als **CSV** und **Excel** (wird im Browser erzeugt)
-- **WLAN ohne Neuflashen:** Ohne Zugangsdaten öffnet der ESP einen Hotspot mit Einrichtungsseite
-- Hell/Dunkel, Deutsch/Englisch, handytauglich
-- Firmware-Update über die Weboberfläche (OTA)
-- **Optional:** MQTT mit Home-Assistant-Discovery, Arena-Uplink für gemeinsames Rudern
+- **Live view** with distance, pace, split/500 m, stroke rate, watts and a history chart
+- **Recording to internal flash** (~10 MB, oldest workouts are deleted when space runs out), recovery after power loss
+- **History and comparison** of workouts, export as **CSV** and **Excel** (generated in the browser)
+- **Wi-Fi setup without reflashing:** without credentials the ESP opens a hotspot with a setup page
+- Light/dark theme, German/English, phone-friendly
+- Firmware update from the web UI (OTA)
+- **Optional:** MQTT with Home Assistant discovery, arena uplink for rowing together
 
-## Schnellstart
+## Quick start
 
-1. Fertiges Image aus [`firmware/release/`](firmware/release/) an Adresse `0x0` flashen (Browser-Flasher oder `esptool`).
-2. Mit dem Hotspot `WaterRower-XXXX` verbinden (Passwort `waterrower`), WLAN auswählen.
-3. `http://waterrower.local` öffnen.
+1. Flash the prebuilt image from [`firmware/release/`](firmware/release/) to address `0x0` (browser flasher or `esptool`).
+2. Connect to the hotspot `WaterRower-XXXX` (password `waterrower`) and pick your Wi-Fi.
+3. Open `http://waterrower.local`.
 
-Details in der [Einrichtung](docs_de/einrichtung.md).
+Details in [Setup](docs_en/einrichtung.md).
 
-## Dokumentation
+## Documentation
 
-| Thema | Datei |
+Available in English (`docs_en/`) and German (`docs_de/`, same file names).
+
+| Topic | File |
 |---|---|
-| Hardware, Flashen, WLAN, Umzug | [docs_de/einrichtung.md](docs_de/einrichtung.md) |
-| Bedienung der Weboberfläche | [docs_de/bedienung.md](docs_de/bedienung.md) |
-| MQTT und Home Assistant | [docs_de/mqtt-home-assistant.md](docs_de/mqtt-home-assistant.md) |
-| Arena (Mehrspieler) | [docs_de/arena.md](docs_de/arena.md) |
-| Sicherheit | [docs_de/sicherheit.md](docs_de/sicherheit.md) |
-| Bauen, Tests, Aufbau des Codes | [docs_de/entwicklung.md](docs_de/entwicklung.md) |
-| Gehäuse zum Drucken | [case/](case/) |
+| Hardware, flashing, Wi-Fi, moving house | [docs_en/einrichtung.md](docs_en/einrichtung.md) |
+| Using the web UI | [docs_en/bedienung.md](docs_en/bedienung.md) |
+| MQTT and Home Assistant | [docs_en/mqtt-home-assistant.md](docs_en/mqtt-home-assistant.md) |
+| Arena (multiplayer) | [docs_en/arena.md](docs_en/arena.md) |
+| Security | [docs_en/sicherheit.md](docs_en/sicherheit.md) |
+| Building, tests, code layout | [docs_en/entwicklung.md](docs_en/entwicklung.md) |
+| Printable case | [case/](case/) |
 
-## Stand und Grenzen
+## Status and limits
 
-- Die Firmware **kompiliert** (ESP-IDF 6.1 via PlatformIO), die Speicherlogik ist auf dem PC getestet. **Auf echter Hardware noch nicht getestet:** USB-Anbindung der S4, Captive Portal, TLS zur Arena und OTA sollten zuerst einzeln geprüft werden.
-- MQTT-Discovery ist auf gültiges JSON geprüft, aber nicht gegen einen echten Broker oder Home Assistant.
-- Excel-Export enthält Tabellen, aber kein Diagramm.
-- Maximal 4 gleichzeitige Live-Ansichten.
+- The firmware **compiles** (ESP-IDF 6.1 via PlatformIO) and the storage logic is tested on a PC. **Not yet tested on real hardware:** the S4 USB link, captive portal, TLS to the arena and OTA should be verified one by one first.
+- MQTT discovery is checked for valid JSON, but not against a real broker or Home Assistant.
+- The Excel export contains tables but no chart.
+- At most 4 simultaneous live views.
+
+The arena server lives in its own repository: [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena).
