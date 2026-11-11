@@ -56,12 +56,12 @@ for strapping it to a strut or tube.
   lightning bolt over the power port, 0.6 mm deep.
 
 **QR lid** (`esp32case_lid_qr.stl`)
-- A QR code to the repository, 22 × 22 mm (25 × 25 modules of 0.88 mm),
+- A QR code to the repository, 30 × 30 mm (25 × 25 modules of 1.2 mm),
   engraved 0.6 mm deep like the WR mark.
-- To make room, the two vent slots next to it are closed; four of six remain,
-  plenty for the ESP's half a watt. The thin spot over the small pocket on
-  the inside is left alone, so at least 1.4 mm of material stays under the
-  code.
+- To make room, the three vent slots next to it are closed; three of six
+  remain, plenty for the ESP's half a watt. The code stays clear of the thin
+  spot over the small pocket (LED window), and at least 1.4 mm of solid
+  material remains under it.
 - The code reads `HTTPS://GITHUB.COM/MOJOONE1/WATERROWER-ESP`: upper case
   fits QR's compact alphanumeric mode and keeps the modules large enough to
   print; GitHub ignores the case.

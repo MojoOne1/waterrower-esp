@@ -2,11 +2,11 @@
 
     python case/tools/lid_qr.py      (needs trimesh, manifold3d, qrcode)
 
-Reads esp32case_lid.stl, closes the two vent slots nearest the free area to
+Reads esp32case_lid.stl, closes the three vent slots nearest the free area to
 make room, engraves the code 0.6 mm deep into the top face and writes
 esp32case_lid_qr.stl. The code is upper case on purpose: the alphanumeric
 QR mode fits the URL into a 25x25 version 2 symbol, which keeps the modules
-0.88 mm wide - printable with a 0.4 mm nozzle. GitHub resolves owner and
+1.2 mm wide (30 mm symbol) - printable with a 0.4 mm nozzle. GitHub resolves owner and
 repository names without regard to case.
 """
 from pathlib import Path
@@ -19,9 +19,9 @@ HERE = Path(__file__).resolve().parent.parent
 URL = "HTTPS://GITHUB.COM/MOJOONE1/WATERROWER-ESP"
 TOP = 7.61            # outer face of the lid (it prints face down)
 DEPTH = 0.6           # same as the WR mark: three 0.2 mm layers
-SIZE = 22.0           # mm, edge of the symbol without quiet zone
-CENTER = (35.25, 14.0)
-SLOTS = [(37.5, 40.5), (43.5, 46.5)]   # vent slots closed for the code
+SIZE = 30.0           # mm, edge of the symbol without quiet zone (1.2 mm modules)
+CENTER = (37.5, 14.0)
+SLOTS = [(37.5, 40.5), (43.5, 46.5), (49.5, 52.5)]   # vent slots closed for the code
 PLATE = (5.61, TOP)                    # z range of the lid plate
 
 
