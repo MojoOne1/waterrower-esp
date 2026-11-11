@@ -4,7 +4,7 @@
 Serves firmware/web/ and answers the /api/* calls with made-up but
 realistic data in the shapes firmware/src/web.c, live.c and store.c produce.
 Nothing here is recorded from a real rower: the sessions are generated
-(deterministically) so the screenshots in docs/ can be reproduced.
+(deterministically) so the screenshots can be reproduced.
 
     python3 mock_server.py [--port 8099] [--state live|idle]
 

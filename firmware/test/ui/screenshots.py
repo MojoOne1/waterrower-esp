@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Take the screenshots used in docs/ from the mock ESP (mock_server.py).
+"""Take the screenshots used in the docs from the mock ESP (mock_server.py).
 
     pip install playwright        # plus any Chrome/Chromium
-    python3 screenshots.py --out ../../../docs/screenshots [--chrome /usr/bin/google-chrome]
+    python3 screenshots.py --out ../../../screenshots [--chrome /usr/bin/google-chrome]
 
 The data is generated, not recorded; see mock_server.py.
 """
