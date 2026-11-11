@@ -64,6 +64,24 @@
     </div>
   </form>
 
+  <form id="mqtt-form">
+    <h2 data-i18n="mqttTitle"></h2>
+    <div class="fields">
+      <label class="check"><input name="enabled" type="checkbox"> <span data-i18n="mqttEnabled"></span></label>
+      <label><span data-i18n="labelHost"></span> <input name="host" autocomplete="off" data-i18n-placeholder="phHost"></label>
+      <label><span data-i18n="labelPort"></span> <input name="port" type="number" min="1" max="65535" value="1883"></label>
+      <label><span data-i18n="labelUser"></span> <input name="username" autocomplete="off" data-i18n-placeholder="phOptional"></label>
+      <label><span data-i18n="labelPassword"></span> <input name="password" type="password" autocomplete="new-password" data-i18n-placeholder="phOptional"></label>
+      <label><span data-i18n="labelPrefix"></span> <input name="prefix" value="waterrower"></label>
+      <label class="check"><input name="discovery" type="checkbox" checked> <span data-i18n="mqttDiscovery"></span></label>
+    </div>
+    <p class="hint" data-i18n-html="mqttHint"></p>
+    <div class="form-foot">
+      <span class="form-msg" id="mqtt-msg"></span>
+      <button type="submit" class="primary" data-i18n="btnSave"></button>
+    </div>
+  </form>
+
   <form id="fw-form">
     <h2 data-i18n="fwTitle"></h2>
     <dl class="fw-facts">

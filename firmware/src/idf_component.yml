@@ -4,3 +4,4 @@ dependencies:
   espressif/mdns: "*"
   joltwallet/littlefs: "*"
   espressif/cjson: "*"
+  espressif/mqtt: "*"

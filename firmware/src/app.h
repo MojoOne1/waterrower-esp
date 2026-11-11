@@ -21,7 +21,7 @@ void settings_set_i32(const char *key, int val);
 /* ---- live state -------------------------------------------------------- */
 typedef struct {
     float distance_m, speed_ms, stroke_rate, strokes, duration_s, watts;
-    float total_distance_m, ratio;
+    float total_distance_m, ratio, pull_s, sess_avg_speed_ms, sess_avg_spm;
     bool  s4_connected, usb_mode, session_active;
     char  session_id[24];
 } live_t;
@@ -31,6 +31,8 @@ void     live_get(live_t *out);
 void     live_put(const live_t *in);
 uint32_t live_seq(void);
 void     live_set_race(const char *json);          /* NULL clears */
+void     live_set_last(const char *json);          /* summary of the last closed session */
+void     live_get_last(char *out, size_t n);
 /* {"values":{...},"session_id":..,"race":..} - returns length */
 int      live_snapshot_json(char *buf, size_t len);
 
@@ -77,6 +79,7 @@ typedef enum { ROWER_CMD_END = 1, ROWER_CMD_RESET = 2 } rower_cmd_t;
 void rower_init(void);
 void rower_cmd(rower_cmd_t c);
 void rower_set_timeout_min(int minutes);
+int  rower_timeout_min(void);
 
 /* ---- wifi -------------------------------------------------------------- */
 void wifi_mgr_init(void);
@@ -93,6 +96,11 @@ void uplink_reconfigure(void);
 void uplink_sample(const char *sid, uint32_t started_at, const sample_t *s);
 void uplink_summary(const sum_t *s);
 int  uplink_status_json(char *buf, size_t len);
+
+/* ---- MQTT (optional, Home Assistant discovery) -------------------------- */
+void mqtt_init(void);
+void mqtt_reconfigure(void);
+int  mqtt_status_json(char *buf, size_t len);
 
 /* ---- web --------------------------------------------------------------- */
 void web_start(void);

@@ -184,6 +184,8 @@ const locale = () => I18N[lang].locale;
 
 
 Object.assign(I18N.de, {
+  mqttTitle: "MQTT / Home Assistant", mqttEnabled: "MQTT aktiv", mqttDiscovery: "Home-Assistant-Discovery senden", mqttOff: "MQTT ist aus",
+  mqttHint: "Topics wie bisher (<code>waterrower/…</code>). Mit Discovery erscheint das Gerät „WaterRower“ von selbst in Home Assistant.",
   connecting: "verbinde …", connOff: "Keine Verbindung zum Gerät", connOn: "Bereit", connLost: "Verbindung verloren, versuche erneut …",
   settingsTitle: "WLAN & Einstellungen", labelSsid: "WLAN-Name", labelWifiPass: "WLAN-Passwort",
   labelTz: "Zeitzone (POSIX)", labelTimeout: "Sitzungs-Timeout (min)", phKeep: "leer = unverändert", btnScan: "Netze suchen",
@@ -196,6 +198,8 @@ Object.assign(I18N.de, {
   fwConfirm: (n) => `${n} installieren? Das Gerät startet danach neu.`, fwUploading: "Lade hoch …", fwDone: "Fertig, das Gerät startet neu …",
 });
 Object.assign(I18N.en, {
+  mqttTitle: "MQTT / Home Assistant", mqttEnabled: "MQTT enabled", mqttDiscovery: "Send Home Assistant discovery", mqttOff: "MQTT is off",
+  mqttHint: "Topics as before (<code>waterrower/…</code>). With discovery the “WaterRower” device shows up in Home Assistant on its own.",
   connecting: "connecting …", connOff: "No connection to the device", connOn: "Ready", connLost: "Connection lost, retrying …",
   settingsTitle: "WiFi & settings", labelSsid: "WiFi name", labelWifiPass: "WiFi password",
   labelTz: "Time zone (POSIX)", labelTimeout: "Session timeout (min)", phKeep: "empty = unchanged", btnScan: "Scan networks",
@@ -839,6 +843,43 @@ arenaForm.onsubmit = async (e) => {
   arenaMsg.textContent = s.connected ? t("formConnected") : (s.error || t("noConnection"));
 };
 
+// --- MQTT (optional) -------------------------------------------------------
+
+const mqttForm = $("mqtt-form"), mqttMsg = $("mqtt-msg");
+
+function mqttStatus(s) {
+  if (!s.enabled) { mqttMsg.textContent = t("mqttOff"); mqttMsg.className = "form-msg"; }
+  else if (s.connected) { mqttMsg.textContent = t("formConnected"); mqttMsg.className = "form-msg ok"; }
+  else { mqttMsg.textContent = s.error || t("noConnection"); mqttMsg.className = "form-msg err"; }
+}
+
+async function loadMqtt() {
+  const s = await (await fetch("/api/mqtt")).json();
+  const f = mqttForm.elements;
+  f.enabled.checked = !!s.enabled; f.host.value = s.host || ""; f.port.value = s.port || 1883;
+  f.username.value = s.username || ""; f.password.value = s.password || "";   // shown as dots, kept unless typed over
+  f.prefix.value = s.prefix || "waterrower"; f.discovery.checked = !!s.discovery;
+  mqttStatus(s);
+}
+
+mqttForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const f = mqttForm.elements;
+  const body = { enabled: f.enabled.checked, host: f.host.value.trim(), port: Number(f.port.value) || 1883,
+    username: f.username.value.trim(), password: f.password.value, prefix: f.prefix.value.trim() || "waterrower",
+    discovery: f.discovery.checked };
+  mqttMsg.textContent = t("formConnecting"); mqttMsg.className = "form-msg";
+  const r = await fetch("/api/mqtt", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) { mqttMsg.textContent = (await r.json()).detail || t("saveFailed"); mqttMsg.className = "form-msg err"; return; }
+  if (!body.enabled) { mqttStatus(await r.json()); return; }
+  for (let i = 0; i < 6; i++) {
+    await new Promise((res) => setTimeout(res, 1500));
+    const s = await (await fetch("/api/mqtt")).json();
+    mqttStatus(s);
+    if (s.connected) break;
+  }
+};
+
 // --- Firmware update (OTA) -------------------------------------------------
 
 $("fw-file").onchange = async (e) => {
@@ -969,6 +1010,7 @@ connectStream();
 loadSessions();
 loadSettings();
 loadArena();
+loadMqtt();
 loadVersion();
 
 // The ESP has no clock without internet: give it the browser's.

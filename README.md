@@ -1,7 +1,7 @@
 # WaterRower ESP
 
 Fork von [MojoOne1/waterrower-mqtt](https://github.com/MojoOne1/waterrower-mqtt) mit dem Ziel: **ein einziges Gerät am Ruderer – der ESP32-S3.**
-Kein MQTT-Broker, kein Home Assistant, kein Tracker-Container. Nur der optionale **Arena-Server** (Mehrspieler) bleibt in Docker.
+Kein Tracker-Container, keine ESPHome-Firmware. MQTT/Home Assistant ist ein **optionaler Schalter** in der Weboberfläche. Nur der optionale **Arena-Server** (Mehrspieler) bleibt in Docker.
 
 ```
 WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)  http://waterrower.local
@@ -19,7 +19,9 @@ WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)
 - Arena-Uplink (`wss://`, Token) mit Nachsenden verpasster Einheiten und Rennstatus
 - Firmware-Update über die Weboberfläche (OTA, `firmware.bin` hochladen)
 
-Bewusst **nicht** mehr dabei: MQTT, Home-Assistant-API/Dashboard, ESPHome.
+- **Optional: MQTT mit Home-Assistant-Discovery** (Karte „MQTT“, standardmäßig aus, per Schalter an/aus). Gleiche Topics und Entitätsnamen wie die alte ESPHome-Firmware (`waterrower/distance`, `waterrower/live`, `waterrower/session/last`, Befehle auf `waterrower/cmd/end_session`). Das Gerät „WaterRower“ mit 23 Entitäten (Sensoren, Buttons *Reset*/*End Session*, Zahl *Session Timeout*) taucht in HA von selbst auf; Last Will markiert sie bei Ausfall als „nicht verfügbar“.
+
+Bewusst **nicht** mehr dabei: ESPHome und dessen native Home-Assistant-API.
 
 ## Bauen und flashen
 
@@ -74,6 +76,7 @@ Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tra
 
 - Die Firmware **kompiliert** (ESP-IDF 6.1 via PlatformIO), die Speicherlogik ist auf dem Host getestet. **Auf echter Hardware noch nicht getestet**: USB-Anbindung der S4, Captive Portal, TLS zur Arena und OTA sollten zuerst einzeln geprüft werden.
 - Ältere Daten aus dem Tracker (SQLite) werden nicht übernommen.
+- MQTT: Die Discovery-Nachrichten sind auf dem Host auf gültiges JSON geprüft, aber nicht gegen einen echten Broker/HA. Im alten HA-Dashboard (`legacy/homeassistant/dashboard.yaml`) gibt es keine Entsprechung für `sensor.waterrower_esphome_version` und `sensor.waterrower_s4_raw_data`; die übrigen Entitätsnamen sollten passen.
 - Das Fallback-WLAN-Passwort ist ein Standardwert (`waterrower`); änderbar über den NVS-Schlüssel `ap_pass`.
 - Excel-Export ohne Diagramm (nur Tabellen); der alte Server-Export enthielt zusätzlich ein Diagramm.
 - Der ESP hält maximal 4 gleichzeitige Live-Ansichten.

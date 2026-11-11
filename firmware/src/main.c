@@ -11,4 +11,5 @@ void app_main(void)
     rower_init();
     web_start();
     uplink_init();
+    mqtt_init();
 }

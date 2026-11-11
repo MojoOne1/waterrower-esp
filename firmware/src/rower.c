@@ -38,6 +38,8 @@ static size_t rx_len;
 static char sid[24];
 static void *shandle;
 static uint32_t s_started, s_last_flush_ms;
+static double sum_speed, sum_spm;
+static uint32_t n_samples;
 
 static uint32_t now_ms(void) { return (uint32_t) (esp_timer_get_time() / 1000); }
 static bool time_valid(void) { return time(NULL) > 1700000000; }
@@ -54,6 +56,9 @@ static void publish(void)
     l.watts = v.watts;
     l.total_distance_m = v.total_m;
     l.ratio = v.pull25 > 0 ? (v.avg25 - v.pull25) * 1.25f : 0;
+    l.pull_s = v.pull25 * 0.025f;
+    l.sess_avg_speed_ms = n_samples ? (float) (sum_speed / n_samples / 100.0) : 0;
+    l.sess_avg_spm = n_samples ? (float) (sum_spm / n_samples) : 0;
     l.s4_connected = s4_present;
     l.usb_mode = usb_mode;
     l.session_active = session_active;
@@ -153,6 +158,7 @@ static void start_session(void)
     snprintf(sid, sizeof sid, "%.23s", buf);
     s_started = epoch_or_uptime();
     s_last_flush_ms = now_ms();
+    sum_speed = sum_spm = 0; n_samples = 0;
     session_active = true;
     ESP_LOGI(TAG, "session start %s", sid);
     publish();
@@ -169,6 +175,11 @@ static void end_session(void)
         s.started_at = s_started;
         store_write_summary(&s);
         uplink_summary(&s);
+        char lj[200];
+        snprintf(lj, sizeof lj,
+            "{\"session_id\":\"%s\",\"distance_m\":%u,\"duration_s\":%u,\"strokes\":%u,\"avg_speed_ms\":%.2f,\"avg_spm\":%.1f}",
+            s.id, (unsigned) s.distance_m, (unsigned) s.duration_s, (unsigned) s.strokes, s.avg_speed_ms, s.avg_spm);
+        live_set_last(lj);
         ESP_LOGI(TAG, "session end %s: %u m, %u s", sid, (unsigned) s.distance_m, (unsigned) s.duration_s);
     } else {
         store_delete(sid);
@@ -189,6 +200,7 @@ static void record_sample(void)
         .watts = (uint16_t) v.watts,
         .spm = (uint8_t) v.stroke_rate,
     };
+    sum_speed += v.speed_cms; sum_spm += v.stroke_rate; n_samples++;
     store_append(shandle, &s);
     uplink_sample(sid, s_started, &s);
     if (now_ms() - s_last_flush_ms > 10000) { store_flush(shandle); s_last_flush_ms = now_ms(); }
@@ -338,6 +350,7 @@ static void rower_task(void *arg)
 }
 
 void rower_cmd(rower_cmd_t c) { if (cmd_q) xQueueSend(cmd_q, &c, 0); }
+int rower_timeout_min(void) { return timeout_min; }
 void rower_set_timeout_min(int m) { timeout_min = m < 1 ? 1 : m > 60 ? 60 : m; }
 
 void rower_init(void)

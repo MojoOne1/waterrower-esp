@@ -295,6 +295,37 @@ static esp_err_t h_arena(httpd_req_t *r)
     return send_json(r, b);
 }
 
+static esp_err_t h_mqtt(httpd_req_t *r)
+{
+    static char b[600];
+    if (r->method == HTTP_POST) {
+        cJSON *j = read_json(r);
+        if (!j) return fail(r, "400 Bad Request", "invalid body");
+        bool on = cJSON_IsTrue(cJSON_GetObjectItem(j, "enabled"));
+        char host[100], pre[48], dpre[32], user[64], pass[64];
+        snprintf(host, sizeof host, "%s", jstr(j, "host", ""));
+        snprintf(pre, sizeof pre, "%s", jstr(j, "prefix", "waterrower"));
+        snprintf(dpre, sizeof dpre, "%s", jstr(j, "discovery_prefix", "homeassistant"));
+        snprintf(user, sizeof user, "%s", jstr(j, "username", ""));
+        const char *pw = jstr(j, "password", "");
+        if (!strcmp(pw, "••••••")) settings_get_str("mq_pass", pass, sizeof pass);
+        else snprintf(pass, sizeof pass, "%s", pw);
+        cJSON *port = cJSON_GetObjectItem(j, "port");
+        int p = cJSON_IsNumber(port) ? (int) port->valuedouble : 1883;
+        bool disc = !cJSON_IsFalse(cJSON_GetObjectItem(j, "discovery"));
+        cJSON_Delete(j);
+        if (on && !host[0]) return fail(r, "400 Bad Request", "Broker address missing");
+        settings_set_str("mq_host", host); settings_set_str("mq_user", user); settings_set_str("mq_pass", pass);
+        settings_set_str("mq_pre", pre[0] ? pre : "waterrower"); settings_set_str("mq_disc_pre", dpre[0] ? dpre : "homeassistant");
+        settings_set_i32("mq_port", p > 0 && p < 65536 ? p : 1883);
+        settings_set_i32("mq_disc", disc); settings_set_i32("mq_on", on);
+        mqtt_reconfigure();
+        vTaskDelay(pdMS_TO_TICKS(400));
+    }
+    mqtt_status_json(b, sizeof b);
+    return send_json(r, b);
+}
+
 static esp_err_t h_wifi(httpd_req_t *r)
 {
     static char b[600];
@@ -380,7 +411,7 @@ static esp_err_t h_ota(httpd_req_t *r)
 void web_start(void)
 {
     httpd_config_t c = HTTPD_DEFAULT_CONFIG();
-    c.max_uri_handlers = 28;
+    c.max_uri_handlers = 32;
     c.max_open_sockets = 8;
     c.lru_purge_enable = true;
     c.stack_size = 8192;
@@ -397,6 +428,7 @@ void web_start(void)
         R("/api/sessions", HTTP_GET, h_sessions),
         R("/api/sessions/*", HTTP_GET, h_session), R("/api/sessions/*", HTTP_DELETE, h_session),
         R("/api/arena", HTTP_GET, h_arena), R("/api/arena", HTTP_POST, h_arena),
+        R("/api/mqtt", HTTP_GET, h_mqtt), R("/api/mqtt", HTTP_POST, h_mqtt),
         R("/api/wifi", HTTP_GET, h_wifi), R("/api/wifi", HTTP_POST, h_wifi),
         R("/api/wifi/scan", HTTP_GET, h_scan),
         R("/api/system", HTTP_GET, h_system), R("/api/system", HTTP_POST, h_system),

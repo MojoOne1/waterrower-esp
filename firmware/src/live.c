@@ -10,6 +10,7 @@ static SemaphoreHandle_t lock;
 static live_t cur;
 static uint32_t seq;
 static char race[1024];
+static char last_json[200];
 static int64_t updated_us;
 
 void live_init(void)
@@ -35,6 +36,21 @@ void live_put(const live_t *in)
 }
 
 uint32_t live_seq(void) { return seq; }
+
+void live_set_last(const char *json)
+{
+    xSemaphoreTake(lock, portMAX_DELAY);
+    snprintf(last_json, sizeof last_json, "%s", json ? json : "");
+    seq++;
+    xSemaphoreGive(lock);
+}
+
+void live_get_last(char *out, size_t n)
+{
+    xSemaphoreTake(lock, portMAX_DELAY);
+    snprintf(out, n, "%s", last_json);
+    xSemaphoreGive(lock);
+}
 
 void live_set_race(const char *json)
 {
