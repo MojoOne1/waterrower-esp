@@ -1,10 +1,10 @@
 # Bedienung
 
-🇩🇪 Deutsch · [🇬🇧 English](en/bedienung.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/bedienung.md)
 
 ## Live
 
-![Live-Ansicht](screenshots/live.png)
+![Live-Ansicht](../screenshots/live.png)
 
 Während des Ruderns zeigt die Seite Distanz, Tempo, Split pro 500 m, Schlagfrequenz, Watt und Dauer, dazu ein Verlaufsdiagramm. Die Werte kommen per Server-Sent-Events vom ESP (einmal pro Sekunde). Eine Einheit beginnt mit dem ersten Zug und endet nach dem eingestellten Timeout oder über *Sitzung beenden*. *Zurücksetzen* verwirft die laufende Einheit.
 
@@ -12,7 +12,7 @@ Die Chips oben zeigen, ob die S4 verbunden ist, ob aufgezeichnet wird und ob die
 
 ## Verlauf und Vergleich
 
-![Verlauf](screenshots/history.png)
+![Verlauf](../screenshots/history.png)
 
 Jede Einheit erscheint mit Datum, Distanz, Dauer, Durchschnittstempo und Mini-Verlauf. Ein Klick öffnet die Einheit mit Diagrammen. Mit *Vergleichen* lassen sich mehrere Einheiten übereinanderlegen.
 
@@ -26,9 +26,9 @@ Jede Einheit erscheint mit Datum, Distanz, Dauer, Durchschnittstempo und Mini-Ve
 Umschalter oben für Sprache (DE/EN) und Darstellung (Auto, hell, dunkel).
 
 <p>
-<img src="screenshots/live-dark.png" width="48%" alt="Dunkelmodus">
-<img src="screenshots/live-phone.png" width="22%" alt="Handy">
-<img src="screenshots/settings-phone.png" width="22%" alt="Einstellungen am Handy">
+<img src="../screenshots/live-dark.png" width="48%" alt="Dunkelmodus">
+<img src="../screenshots/live-phone.png" width="22%" alt="Handy">
+<img src="../screenshots/settings-phone.png" width="22%" alt="Einstellungen am Handy">
 </p>
 
 ## Speicher

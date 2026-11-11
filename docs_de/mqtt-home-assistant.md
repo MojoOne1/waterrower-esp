@@ -1,6 +1,6 @@
 # MQTT und Home Assistant
 
-🇩🇪 Deutsch · [🇬🇧 English](en/mqtt-home-assistant.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/mqtt-home-assistant.md)
 
 Optional und standardmäßig **aus**. In der Weboberfläche gibt es eine Karte *MQTT* mit Schalter, Broker-Adresse, Zugangsdaten und Topic-Präfix (Standard `waterrower`). Aktiviert veröffentlicht der ESP Discovery-Nachrichten unter `homeassistant/…`; das Gerät „WaterRower“ erscheint in Home Assistant von selbst.
 

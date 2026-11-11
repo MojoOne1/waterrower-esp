@@ -1,6 +1,6 @@
 # Security
 
-[🇩🇪 Deutsch](../sicherheit.md) · 🇬🇧 English
+[🇩🇪 Deutsch](../docs_de/sicherheit.md) · 🇬🇧 English
 
 The ESP sits on the home network without TLS. What the firmware does about it, and what it does not.
 

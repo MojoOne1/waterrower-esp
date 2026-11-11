@@ -1,6 +1,6 @@
 # Usage
 
-[🇩🇪 Deutsch](../bedienung.md) · 🇬🇧 English
+[🇩🇪 Deutsch](../docs_de/bedienung.md) · 🇬🇧 English
 
 ## Live
 

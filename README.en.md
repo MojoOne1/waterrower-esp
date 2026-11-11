@@ -4,7 +4,7 @@
 
 Firmware for an **ESP32-S3** that sits between the WaterRower S4 and your Wi-Fi: it reads the rowing machine over USB, records every workout to its own flash and serves the web UI itself. No server, no container, no cloud account.
 
-![Live view](docs/screenshots/live.png)
+![Live view](screenshots/live.png)
 
 ```
 WaterRower S4 ──USB──► ESP32-S3 ──Wi-Fi──► browser (phone/PC)  http://waterrower.local
@@ -31,21 +31,19 @@ WaterRower S4 ──USB──► ESP32-S3 ──Wi-Fi──► browser (phone/PC
 2. Connect to the hotspot `WaterRower-XXXX` (password `waterrower`) and pick your Wi-Fi.
 3. Open `http://waterrower.local`.
 
-Details in [Setup](docs/en/einrichtung.md).
+Details in [Setup](docs_en/einrichtung.md).
 
 ## Documentation
 
 | Topic | File |
 |---|---|
-| Hardware, flashing, Wi-Fi, moving house | [docs/en/einrichtung.md](docs/en/einrichtung.md) |
-| Using the web UI | [docs/en/bedienung.md](docs/en/bedienung.md) |
-| MQTT and Home Assistant | [docs/en/mqtt-home-assistant.md](docs/en/mqtt-home-assistant.md) |
-| Arena (multiplayer) | [docs/en/arena.md](docs/en/arena.md) |
-| Security | [docs/en/sicherheit.md](docs/en/sicherheit.md) |
-| Building, tests, code layout | [docs/en/entwicklung.md](docs/en/entwicklung.md) |
+| Hardware, flashing, Wi-Fi, moving house | [docs_en/einrichtung.md](docs_en/einrichtung.md) |
+| Using the web UI | [docs_en/bedienung.md](docs_en/bedienung.md) |
+| MQTT and Home Assistant | [docs_en/mqtt-home-assistant.md](docs_en/mqtt-home-assistant.md) |
+| Arena (multiplayer) | [docs_en/arena.md](docs_en/arena.md) |
+| Security | [docs_en/sicherheit.md](docs_en/sicherheit.md) |
+| Building, tests, code layout | [docs_en/entwicklung.md](docs_en/entwicklung.md) |
 | Printable case | [case/](case/) |
-
-(The documentation file names are German; the content in `docs/en/` is English.)
 
 ## Status and limits
 

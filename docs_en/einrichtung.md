@@ -1,19 +1,19 @@
 # Setup
 
-[🇩🇪 Deutsch](../einrichtung.md) · 🇬🇧 English
+[🇩🇪 Deutsch](../docs_de/einrichtung.md) · 🇬🇧 English
 
 ## Hardware
 
 - ESP32-S3-DevKitC-1 (N16R8: 16 MB flash, 8 MB PSRAM)
 - USB-OTG solder bridge on the board closed
 - **COM** port to the PC (flashing, log), **USB** port via adapter to the WaterRower S4 (host mode)
-- Case: [case/](../../case/)
+- Case: [case/](../case/)
 
 ## Flashing
 
 ### Prebuilt image
 
-[`firmware/release/waterrower-esp-3.0.0-merged.bin`](../../firmware/release/) contains bootloader, partition table, OTA data and app and goes to **address 0x0**:
+[`firmware/release/waterrower-esp-3.0.0-merged.bin`](../firmware/release/) contains bootloader, partition table, OTA data and app and goes to **address 0x0**:
 
 - Browser (Chrome/Edge): <https://espressif.github.io/esptool-js/>, offset `0x0`
 - Command line: `esptool --chip esp32s3 write_flash 0x0 waterrower-esp-3.0.0-merged.bin`

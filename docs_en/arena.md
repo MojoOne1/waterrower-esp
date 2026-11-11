@@ -1,6 +1,6 @@
 # Arena (multiplayer)
 
-[🇩🇪 Deutsch](../arena.md) · 🇬🇧 English
+[🇩🇪 Deutsch](../docs_de/arena.md) · 🇬🇧 English
 
 The ESP can send workouts live to an arena server to row together. The server has its own repository: [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena) (Docker; operation, protocol and API are documented there). Only whoever **runs** an arena needs Docker.
 

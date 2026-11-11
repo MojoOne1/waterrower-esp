@@ -4,7 +4,7 @@
 
 Firmware für einen **ESP32-S3**, der zwischen WaterRower S4 und WLAN sitzt: Er liest die Rudermaschine per USB, zeichnet jede Einheit im eigenen Flash auf und liefert die Weboberfläche gleich mit. Kein Server, kein Container, kein Cloud-Konto.
 
-![Live-Ansicht](docs/screenshots/live.png)
+![Live-Ansicht](screenshots/live.png)
 
 ```
 WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)  http://waterrower.local
@@ -31,18 +31,18 @@ WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)
 2. Mit dem Hotspot `WaterRower-XXXX` verbinden (Passwort `waterrower`), WLAN auswählen.
 3. `http://waterrower.local` öffnen.
 
-Details in der [Einrichtung](docs/einrichtung.md).
+Details in der [Einrichtung](docs_de/einrichtung.md).
 
 ## Dokumentation
 
 | Thema | Datei |
 |---|---|
-| Hardware, Flashen, WLAN, Umzug | [docs/einrichtung.md](docs/einrichtung.md) |
-| Bedienung der Weboberfläche | [docs/bedienung.md](docs/bedienung.md) |
-| MQTT und Home Assistant | [docs/mqtt-home-assistant.md](docs/mqtt-home-assistant.md) |
-| Arena (Mehrspieler) | [docs/arena.md](docs/arena.md) |
-| Sicherheit | [docs/sicherheit.md](docs/sicherheit.md) |
-| Bauen, Tests, Aufbau des Codes | [docs/entwicklung.md](docs/entwicklung.md) |
+| Hardware, Flashen, WLAN, Umzug | [docs_de/einrichtung.md](docs_de/einrichtung.md) |
+| Bedienung der Weboberfläche | [docs_de/bedienung.md](docs_de/bedienung.md) |
+| MQTT und Home Assistant | [docs_de/mqtt-home-assistant.md](docs_de/mqtt-home-assistant.md) |
+| Arena (Mehrspieler) | [docs_de/arena.md](docs_de/arena.md) |
+| Sicherheit | [docs_de/sicherheit.md](docs_de/sicherheit.md) |
+| Bauen, Tests, Aufbau des Codes | [docs_de/entwicklung.md](docs_de/entwicklung.md) |
 | Gehäuse zum Drucken | [case/](case/) |
 
 ## Stand und Grenzen

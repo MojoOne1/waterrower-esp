@@ -1,6 +1,6 @@
 # MQTT and Home Assistant
 
-[🇩🇪 Deutsch](../mqtt-home-assistant.md) · 🇬🇧 English
+[🇩🇪 Deutsch](../docs_de/mqtt-home-assistant.md) · 🇬🇧 English
 
 Optional and **off** by default. The web UI has an *MQTT* card with a switch, broker address, credentials and topic prefix (default `waterrower`). When enabled, the ESP publishes discovery messages under `homeassistant/…`; the device "WaterRower" shows up in Home Assistant on its own.
 

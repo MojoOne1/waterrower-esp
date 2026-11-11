@@ -1,6 +1,6 @@
 # Entwicklung
 
-🇩🇪 Deutsch · [🇬🇧 English](en/entwicklung.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/entwicklung.md)
 
 ## Bauen
 
@@ -47,7 +47,7 @@ Läuft auch in GitHub Actions (`.github/workflows/firmware.yml`), danach wird ge
 
 ```bash
 pip install playwright pillow
-python3 firmware/test/ui/screenshots.py --out docs/screenshots --chrome /usr/bin/google-chrome
+python3 firmware/test/ui/screenshots.py --out screenshots --chrome /usr/bin/google-chrome
 ```
 
 Mock-Server allein: `python3 firmware/test/ui/mock_server.py --state live` (Port 8099).

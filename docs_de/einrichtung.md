@@ -1,6 +1,6 @@
 # Einrichtung
 
-🇩🇪 Deutsch · [🇬🇧 English](en/einrichtung.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/einrichtung.md)
 
 ## Hardware
 
@@ -36,7 +36,7 @@ Spätere Updates laufen über die Weboberfläche (Karte *Firmware-Update*, Datei
 
 Ohne gespeicherte Zugangsdaten, oder wenn das Netz nicht erreichbar ist, öffnet der ESP nach ca. 20 s den Hotspot **`WaterRower-XXXX`** (Passwort `waterrower`).
 
-![Einrichtungsportal](screenshots/setup-portal.png)
+![Einrichtungsportal](../screenshots/setup-portal.png)
 
 1. Handy mit dem Hotspot verbinden. Die Einrichtungsseite öffnet sich selbst, sonst `http://192.168.4.1/setup`.
 2. Netz wählen, Passwort eingeben, speichern.
@@ -46,7 +46,7 @@ Auch ohne WLAN lässt sich rudern: Die Seite ist am Hotspot unter `192.168.4.1` 
 
 ## Einstellungen
 
-![Einstellungen](screenshots/settings.png)
+![Einstellungen](../screenshots/settings.png)
 
 | Feld | Bedeutung |
 |---|---|

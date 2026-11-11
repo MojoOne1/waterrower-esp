@@ -1,6 +1,6 @@
 # Arena (Mehrspieler)
 
-🇩🇪 Deutsch · [🇬🇧 English](en/arena.md)
+🇩🇪 Deutsch · [🇬🇧 English](../docs_en/arena.md)
 
 Der ESP kann Einheiten live an einen Arena-Server schicken, um gemeinsam zu rudern. Den Server gibt es im eigenen Repository: [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena) (Docker; Betrieb, Protokoll und API dort). Nur wer eine Arena **betreibt**, braucht Docker.
 
