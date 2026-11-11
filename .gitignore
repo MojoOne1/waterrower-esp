@@ -1,6 +1,5 @@
 .env
 __pycache__/
-server/data/
 firmware/.pio/
 firmware/managed_components/
 firmware/sdkconfig.esp32s3

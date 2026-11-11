@@ -434,21 +434,16 @@ docker compose up -d</code></pre></div>
       title: "Arena aufsetzen",
       when: (s) => s.role === "host",
       html: `
-        <p>Repo auf den Docker-Host, dann im Ordner <code>server/</code>:</p>
-        <div class="cmd"><pre><code>echo "ARENA_ADMIN_PASSWORD=waehl-was-langes" > .env
+        <p>Die Arena hat ein eigenes Repository:
+          <a href="https://github.com/MojoOne1/waterrower-arena">MojoOne1/waterrower-arena</a>. Auf den Docker-Host klonen,
+          <code>.env</code> aus <code>.env.example</code> anlegen und starten:</p>
+        <div class="cmd"><pre><code>git clone https://github.com/MojoOne1/waterrower-arena
+cd waterrower-arena
+cp .env.example .env     # ARENA_ADMIN_PASSWORD und TUNNEL_TOKEN eintragen
 docker compose up -d --build</code></pre></div>
-        <p>Oberfläche auf <code>http://&lt;host&gt;:8090</code>, Anmeldung als
-          <code>admin</code>.</p>
-        <div class="note warn"><code>ARENA_SECURE_COOKIES</code> bleibt auf <code>0</code>,
-          solange du über <code>http://</code> gehst – sonst verwirft der Browser das
-          Sitzungs-Cookie und die Anmeldung hält nicht.</div>
-        <p>Wenn das steht, den Tunnel dazu: Token aus Cloudflare Zero Trust in die
-          <code>.env</code>, den Public Hostname auf <code>http://arena:8090</code> zeigen
-          lassen, <code>ARENA_SECURE_COOKIES</code> auf <code>1</code>:</p>
-        <div class="cmd"><pre><code>docker compose --profile tunnel up -d --build</code></pre></div>
-        <div class="note"><b>Danach den <code>ports:</code>-Block löschen.</b> Solange der
-          Port direkt erreichbar ist, kann jeder eine beliebige Absenderadresse behaupten
-          und damit an allen Sperren vorbei.</div>`
+        <p>Anmeldung als <code>admin</code>. Tunnel, eigener Reverse-Proxy,
+          Test über <code>http://</code> und Passwort vergessen stehen in
+          <a href="https://github.com/MojoOne1/waterrower-arena/blob/main/docs/betrieb.md">docs/betrieb.md</a>.</p>`
     },
     {
       id: "arena-athletes",

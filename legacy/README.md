@@ -1,5 +1,7 @@
 # waterrower-mqtt
 
+> **Hinweis:** Die Arena (`server/`) und das Compose-File im Wurzelverzeichnis sind in ein eigenes Repository umgezogen: <https://github.com/MojoOne1/waterrower-arena>. Verweise auf `server/` und `../docker-compose.yml` unten gelten für den Stand vor dem Umzug.
+
 Reads out a WaterRower Series IV Performance Monitor over USB and makes the
 values available in Home Assistant, via MQTT, and through a local web UI.
 No computer needed at the rowing machine – an ESP32-S3 for under €10 takes

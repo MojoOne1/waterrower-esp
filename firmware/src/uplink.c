@@ -1,5 +1,5 @@
 /* Uplink to a WaterRower Arena server over one outbound WebSocket.
- * Protocol: see server/app/ingest.py (hello / welcome / sample / summary /
+ * Protocol: see docs/protokoll.md in MojoOne1/waterrower-arena (hello / welcome / sample / summary /
  * backfill / ack / cmd).
  *
  * One task owns the client and every send, so a streamed backfill never

@@ -1,12 +1,12 @@
 # WaterRower ESP
 
 Fork von [MojoOne1/waterrower-mqtt](https://github.com/MojoOne1/waterrower-mqtt) mit dem Ziel: **ein einziges Gerät am Ruderer – der ESP32-S3.**
-Kein Tracker-Container, keine ESPHome-Firmware. MQTT/Home Assistant ist ein **optionaler Schalter** in der Weboberfläche. Nur der optionale **Arena-Server** (Mehrspieler) bleibt in Docker.
+Kein Tracker-Container, keine ESPHome-Firmware. MQTT/Home Assistant ist ein **optionaler Schalter** in der Weboberfläche. Nur der optionale **Arena-Server** (Mehrspieler) läuft in Docker und liegt in einem eigenen Repository: [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena).
 
 ```
 WaterRower S4 ──USB──► ESP32-S3 ──WLAN──► Browser (Handy/PC)  http://waterrower.local
                         │  Aufzeichnung (Flash), Diagramme, CSV/Excel
-                        └── ausgehende WebSocket ──► Arena (Docker, optional)
+                        └── ausgehende WebSocket ──► Arena (Docker, optional, eigenes Repo)
 ```
 
 ## Was der ESP kann
@@ -69,20 +69,15 @@ Bewusst offen bzw. nicht abgedeckt:
 
 ```bash
 sh firmware/test/host/run.sh          # Speicher, Eingabeprüfung, MQTT-Discovery (ohne Hardware)
-pip install -r server/requirements.txt -r legacy/docker/requirements.txt httpx pyyaml
-python tests/run_all.py               # Arena (und der alte Tracker als Gegenstelle)
 ```
+
+Die Tests des Arena-Servers liegen im Arena-Repository (`python tests/run_all.py`). Die Tests der alten Tracker-Variante unter `legacy/` wurden mit dem Umzug der Arena entfernt; sie stehen in der Git-Historie (Commit `1d2cb70`).
 
 ## Arena (Mehrspieler)
 
-Nur wer die Arena **betreibt**, braucht Docker:
+Der Arena-Server wohnt in [MojoOne1/waterrower-arena](https://github.com/MojoOne1/waterrower-arena) (Docker, Cloudflare Tunnel oder eigener Proxy; Betrieb, Protokoll und API sind dort dokumentiert). Nur wer die Arena **betreibt**, braucht Docker.
 
-```bash
-cp server/.env.example .env     # ARENA_ADMIN_PASSWORD und TUNNEL_TOKEN setzen
-docker compose up -d --build
-```
-
-Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tracker-Verbindung* einen Token. Im ESP (Status-Chip → Arena) **Adresse** (z. B. `https://arena.example.com`) und **Token** eintragen und aktivieren. Es gibt keinen Tracker-Container mehr; der ESP spricht direkt mit der Arena. Das Protokoll ist unverändert (`server/app/ingest.py`).
+Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tracker-Verbindung* einen Token. Im ESP (Status-Chip → Arena) **Adresse** (z. B. `https://arena.example.com`) und **Token** eintragen und aktivieren. Der ESP spricht direkt mit der Arena; das Protokoll steht in [docs/protokoll.md](https://github.com/MojoOne1/waterrower-arena/blob/main/docs/protokoll.md), die Firmware-Seite in `firmware/src/uplink.c`.
 
 ## Aufbau
 
@@ -94,9 +89,9 @@ Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tra
 | `firmware/src/wifi_mgr.c` | WLAN, Fallback-Hotspot, Captive-DNS, mDNS, NTP |
 | `firmware/src/uplink.c` | WebSocket-Client zur Arena inkl. Backfill |
 | `firmware/web/` | Oberfläche (wird beim Build gzip-komprimiert in die Firmware eingebettet) |
-| `server/` | Arena-Server (unverändert) |
 | `firmware/test/host/` | Tests, die ohne Hardware auf dem PC laufen |
-| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container (unverändert, nicht Teil des Reviews) |
+| `firmware/release/` | Fertiges Komplett-Image zum ersten Flashen (Adresse `0x0`) |
+| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container (unverändert, nicht Teil des Reviews, ohne Tests und ohne Arena) |
 
 ## Stand und Grenzen
 
