@@ -70,13 +70,13 @@ Mitrudern: Der Betreiber legt einen Athleten an und erzeugt unter *Konto → Tra
 | `firmware/src/uplink.c` | WebSocket-Client zur Arena inkl. Backfill |
 | `firmware/web/` | Oberfläche (wird beim Build gzip-komprimiert in die Firmware eingebettet) |
 | `server/` | Arena-Server (unverändert) |
-| `legacy/` | Die alte Variante: ESPHome-Firmware, Tracker-Container, Home-Assistant-Dashboard |
+| `legacy/` | Die alte Variante: ESPHome-Firmware und Tracker-Container |
 
 ## Stand und Grenzen
 
 - Die Firmware **kompiliert** (ESP-IDF 6.1 via PlatformIO), die Speicherlogik ist auf dem Host getestet. **Auf echter Hardware noch nicht getestet**: USB-Anbindung der S4, Captive Portal, TLS zur Arena und OTA sollten zuerst einzeln geprüft werden.
 - Ältere Daten aus dem Tracker (SQLite) werden nicht übernommen.
-- MQTT: Die Discovery-Nachrichten sind auf dem Host auf gültiges JSON geprüft, aber nicht gegen einen echten Broker/HA. Im alten HA-Dashboard (`legacy/homeassistant/dashboard.yaml`) gibt es keine Entsprechung für `sensor.waterrower_esphome_version` und `sensor.waterrower_s4_raw_data`; die übrigen Entitätsnamen sollten passen.
+- MQTT: Die Discovery-Nachrichten sind auf dem Host auf gültiges JSON geprüft, aber nicht gegen einen echten Broker/HA. Ein Home-Assistant-Dashboard liefert der Fork nicht mit; das baut sich jeder selbst aus den Discovery-Entitäten.
 - Das Fallback-WLAN-Passwort ist ein Standardwert (`waterrower`); änderbar über den NVS-Schlüssel `ap_pass`.
 - Excel-Export ohne Diagramm (nur Tabellen); der alte Server-Export enthielt zusätzlich ein Diagramm.
 - Der ESP hält maximal 4 gleichzeitige Live-Ansichten.
