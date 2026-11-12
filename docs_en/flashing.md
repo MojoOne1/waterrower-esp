@@ -16,9 +16,9 @@
 | File | Purpose | Where |
 |---|---|---|
 | `waterrower-esp-3.0.0-merged.bin` | **First flash** (contains everything) | browser flasher, address **`0x0`** |
-| `firmware.bin` (from `pio run`) | **Later update** | web UI, *Firmware update* card |
+| `waterrower-esp-3.0.0-ota.bin` (also in [`firmware/release/`](../firmware/release/); the same as `firmware.bin` from `pio run`) | **Later update** | web UI, *Firmware update* card |
 
-Do not mix them up: flashing `firmware.bin` to `0x0` leaves the device unable to boot. The image starts at `0x0` because it also contains the bootloader and partition table, which must sit there.
+Do not mix them up: flashing the update file (`…-ota.bin`) to `0x0` leaves the device unable to boot. The image starts at `0x0` because it also contains the bootloader and partition table, which must sit there.
 
 ## Step by step
 

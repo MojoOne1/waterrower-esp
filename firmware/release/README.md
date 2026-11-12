@@ -6,8 +6,8 @@ Step by step with the browser flasher: [English](../../docs_en/flashing.md) · [
 
 Quick command line: `esptool --chip esp32s3 write_flash 0x0 waterrower-esp-3.0.0-merged.bin`
 
-Later updates go through the web UI (*Firmware update* card) with `firmware.bin` from `pio run`,
-**not** with this image. Checksum: see `SHA256SUMS`. The image is a build of the respective commit,
+Later updates go through the web UI (*Firmware update* card) with `waterrower-esp-3.0.0-ota.bin` (the app only,
+settings are kept), **not** with this image. Checksum: see `SHA256SUMS`. The image is a build of the respective commit,
 not a signed release.
 
 ---
@@ -18,6 +18,6 @@ Schritt für Schritt mit dem Browser-Flasher: [Deutsch](../../docs_de/flashen.md
 
 Kurz per Kommandozeile: `esptool --chip esp32s3 write_flash 0x0 waterrower-esp-3.0.0-merged.bin`
 
-Spätere Updates laufen über die Weboberfläche (Karte *Firmware-Update*) mit `firmware.bin` aus `pio run`,
-**nicht** mit diesem Image. Prüfsumme: siehe `SHA256SUMS`. Das Image ist ein Build aus dem jeweiligen Commit,
+Spätere Updates laufen über die Weboberfläche (Karte *Firmware-Update*) mit `waterrower-esp-3.0.0-ota.bin` (nur die App,
+Einstellungen bleiben erhalten), **nicht** mit diesem Image. Prüfsumme: siehe `SHA256SUMS`. Das Image ist ein Build aus dem jeweiligen Commit,
 kein signiertes Release.

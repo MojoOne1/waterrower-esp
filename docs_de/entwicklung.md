@@ -62,5 +62,6 @@ B=.pio/build/esp32s3
 ~/.platformio/packages/tool-esptool/esptool --chip esp32s3 merge_bin -o release/waterrower-esp-3.0.0-merged.bin \
   --flash_mode dio --flash_freq 80m --flash_size 16MB \
   0x0 $B/bootloader.bin 0x8000 $B/partitions.bin 0xf000 $B/ota_data_initial.bin 0x20000 $B/firmware.bin
+cp $B/firmware.bin release/waterrower-esp-3.0.0-ota.bin      # update file for the web UI
 (cd release && sha256sum *.bin > SHA256SUMS)
 ```
