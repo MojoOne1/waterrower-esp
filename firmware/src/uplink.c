@@ -16,6 +16,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include <time.h>
 #include "esp_websocket_client.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -48,6 +49,10 @@ static char *rx;
 #define SKIP_MAX 16
 static char skip[SKIP_MAX][24];      /* sent on this connection, waiting for the arena's ack */
 static int nskip;
+
+/* TLS checks the certificate's validity dates, so connecting before SNTP has
+   set the clock (it starts at 1970) fails with "no matching trusted root". */
+static bool clock_ok(void) { return time(NULL) > 1735689600; }   /* after 2025-01-01 */
 
 static uint32_t now_s(void) { return (uint32_t) (esp_timer_get_time() / 1000000); }
 static bool cfg_ok(void) { return enabled && url[0] && token[0]; }
@@ -121,7 +126,7 @@ static void ws_event(void *arg, esp_event_base_t base, int32_t id, void *data)
         break;
     }
     case WEBSOCKET_EVENT_ERROR:
-        if (!last_error[0]) set_error("connection failed");
+        if (!last_error[0]) set_error("connection failed (TLS/DNS/firewall)");
         /* fall through */
     case WEBSOCKET_EVENT_DISCONNECTED:
     case WEBSOCKET_EVENT_CLOSED:
@@ -348,8 +353,14 @@ static void uplink_task(void *arg)
             retry_s = retry_s * 2 > RETRY_MAX_S ? RETRY_MAX_S : retry_s * 2;
         }
         if (!client) {
-            if (cfg_ok() && wifi_mgr_connected() && now_s() >= retry_at) create_client();
-            else { vTaskDelay(pdMS_TO_TICKS(500)); xQueueReset(q); }
+            if (cfg_ok() && wifi_mgr_connected() && !clock_ok()) {
+                set_error("waiting for time sync (NTP)");
+                vTaskDelay(pdMS_TO_TICKS(500));
+                xQueueReset(q);
+            } else if (cfg_ok() && wifi_mgr_connected() && now_s() >= retry_at) {
+                set_error("");
+                create_client();
+            } else { vTaskDelay(pdMS_TO_TICKS(500)); xQueueReset(q); }
             continue;
         }
         if (connected) retry_s = RETRY_MIN_S;
