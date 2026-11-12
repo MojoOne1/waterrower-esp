@@ -193,6 +193,7 @@ Object.assign(I18N.de, {
   settingsTitle: "WLAN & Einstellungen", labelSsid: "WLAN-Name", labelWifiPass: "WLAN-Passwort",
   labelTz: "Zeitzone (POSIX)", labelTimeout: "Sitzungs-Timeout (min)", phKeep: "leer = unverändert", btnScan: "Netze suchen",
   settingsHint: "Ohne WLAN öffnet das Gerät den Hotspot <code>WaterRower-XXXX</code> (Passwort <code>waterrower</code>); diese Seite ist dort unter <code>192.168.4.1</code> erreichbar.",
+  clockLabel: "Gerätezeit", clockUnset: "Gerätezeit nicht gesetzt",
   wifiOn: (ssid, ip) => `Verbunden mit ${ssid} · ${ip}`, wifiOff: "Nicht mit einem WLAN verbunden",
   wifiAp: (ap) => `Hotspot aktiv: ${ap}`, wifiPending: "Noch keine Verbindung – Name und Passwort prüfen, das Gerät versucht es weiter.",
   scanning: "Suche …", scanDone: (n) => `${n} Netze gefunden`,
@@ -210,6 +211,7 @@ Object.assign(I18N.en, {
   settingsTitle: "WiFi & settings", labelSsid: "WiFi name", labelWifiPass: "WiFi password",
   labelTz: "Time zone (POSIX)", labelTimeout: "Session timeout (min)", phKeep: "empty = unchanged", btnScan: "Scan networks",
   settingsHint: "Without WiFi the device opens the hotspot <code>WaterRower-XXXX</code> (password <code>waterrower</code>); this page is then at <code>192.168.4.1</code>.",
+  clockLabel: "Device time", clockUnset: "Device time not set",
   wifiOn: (ssid, ip) => `Connected to ${ssid} · ${ip}`, wifiOff: "Not connected to a WiFi network",
   wifiAp: (ap) => `Hotspot active: ${ap}`, wifiPending: "Not connected yet – check name and password; the device keeps trying.",
   scanning: "Scanning …", scanDone: (n) => `${n} networks found`,
@@ -1008,7 +1010,7 @@ setInterval(pollArena, 15000);
 
 // --- Version footer --------------------------------------------------------
 
-const REPO = "https://github.com/MojoOne1/waterrower-mqtt";
+const REPO = "https://github.com/MojoOne1/waterrower-esp";
 let appVersion = null;
 
 function renderFooter() {
@@ -1018,14 +1020,27 @@ function renderFooter() {
     ? `<a href="${REPO}/commit/${appVersion.commit}" target="_blank" rel="noopener">${appVersion.commit.slice(0, 7)}</a>`
     : appVersion.commit;
   parts.push(`Firmware v${appVersion.version}`);
+  parts.push(deviceClock());
   $("fw-running").textContent = appVersion.version;
   $("foot").innerHTML = parts.join(" &nbsp;·&nbsp; ");
 }
 
+// The device's own clock (not the browser's): what recordings and TLS use.
+let clockBase = null;
+function deviceClock() {
+  if (!clockBase) return "";
+  if (!clockBase.time) return t("clockUnset");
+  const s = clockBase.time + clockBase.offset + Math.floor((Date.now() - clockBase.at) / 1000);
+  return t("clockLabel") + " " + new Date(s * 1000).toISOString().slice(0, 19).replace("T", " ");
+}
+
 async function loadVersion() {
   appVersion = await (await fetch("/api/version")).json();
+  clockBase = { time: appVersion.time || 0, offset: appVersion.utc_offset || 0, at: Date.now() };
   renderFooter();
 }
+setInterval(renderFooter, 1000);
+setInterval(() => { loadVersion().catch(() => {}); }, 60000);
 
 // --- Start ---------------------------------------------------------------
 applyTheme();

@@ -154,7 +154,7 @@ class Handler(BaseHTTPRequestHandler):
                 ctype = "text/css" if f.suffix == ".css" else "application/javascript"
                 return self.send(f.read_bytes(), ctype)
         if path == "/api/version":
-            return self.send({"version": "3.0.0-esp", "commit": ""})
+            return self.send({"version": "3.0.0-esp", "commit": "", "time": int(time.time()), "utc_offset": 3600})
         if path == "/api/live":
             return self.send(live(self.state))
         if path == "/api/stream":

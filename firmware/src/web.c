@@ -444,7 +444,19 @@ static esp_err_t h_reset(httpd_req_t *r) { if (!guard(r, G_WRITE)) return ESP_OK
 static esp_err_t h_version(httpd_req_t *r)
 {
     if (!guard(r, G_READ)) return ESP_OK;
-    return send_json(r, "{\"version\":\"" FW_VERSION "\",\"commit\":\"\"}");
+    /* The device's own clock, so the footer shows what recordings and TLS see.
+       time 0 = not set yet (no NTP, no browser visit). */
+    time_t now = time(NULL);
+    long t = now > 1700000000 ? (long) now : 0, off = 0;
+    if (t) {
+        struct tm g;
+        gmtime_r(&now, &g);
+        g.tm_isdst = -1;
+        off = (long) (now - mktime(&g));      /* local - UTC, DST included */
+    }
+    char b[128];
+    snprintf(b, sizeof b, "{\"version\":\"" FW_VERSION "\",\"commit\":\"\",\"time\":%ld,\"utc_offset\":%ld}", t, off);
+    return send_json(r, b);
 }
 
 /* Lets the page obtain the device password before a large upload. */
